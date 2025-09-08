@@ -184,6 +184,128 @@ function App() {
     }
   ];
 
+  const advancedDockerCommands = [
+    {
+      command: 'docker exec -it <container> <command>',
+      description: 'Execute a command inside a running container interactively',
+      example: 'docker exec -it my-container bash',
+      useCase: 'Debug issues, inspect files, or run commands inside running containers',
+      icon: <Terminal className="h-5 w-5" />
+    },
+    {
+      command: 'docker logs <container>',
+      description: 'View logs from a container',
+      example: 'docker logs --follow my-app-container',
+      useCase: 'Debug application issues by examining container output and error logs',
+      icon: <FileText className="h-5 w-5" />
+    },
+    {
+      command: 'docker inspect <container>',
+      description: 'Display detailed information about a container or image',
+      example: 'docker inspect my-container',
+      useCase: 'Get comprehensive metadata, network settings, and configuration details',
+      icon: <Settings className="h-5 w-5" />
+    },
+    {
+      command: 'docker cp <container>:<path> <host-path>',
+      description: 'Copy files between container and host filesystem',
+      example: 'docker cp my-container:/app/logs ./logs',
+      useCase: 'Extract files from containers or inject files into running containers',
+      icon: <Copy className="h-5 w-5" />
+    },
+    {
+      command: 'docker network ls',
+      description: 'List all Docker networks',
+      example: 'docker network ls',
+      useCase: 'View available networks for container communication and isolation',
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      command: 'docker network create <network>',
+      description: 'Create a custom Docker network',
+      example: 'docker network create my-app-network',
+      useCase: 'Create isolated networks for multi-container applications',
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      command: 'docker volume ls',
+      description: 'List all Docker volumes',
+      example: 'docker volume ls',
+      useCase: 'Manage persistent data storage across container lifecycles',
+      icon: <Database className="h-5 w-5" />
+    },
+    {
+      command: 'docker volume create <volume>',
+      description: 'Create a named volume for persistent storage',
+      example: 'docker volume create my-data-volume',
+      useCase: 'Create persistent storage that survives container removal',
+      icon: <Database className="h-5 w-5" />
+    },
+    {
+      command: 'docker stats',
+      description: 'Display real-time resource usage statistics for containers',
+      example: 'docker stats --no-stream',
+      useCase: 'Monitor CPU, memory, and network usage of running containers',
+      icon: <Monitor className="h-5 w-5" />
+    },
+    {
+      command: 'docker top <container>',
+      description: 'Display running processes inside a container',
+      example: 'docker top my-container',
+      useCase: 'Monitor what processes are running inside a specific container',
+      icon: <Monitor className="h-5 w-5" />
+    },
+    {
+      command: 'docker port <container>',
+      description: 'List port mappings for a container',
+      example: 'docker port my-web-app',
+      useCase: 'Check which host ports are mapped to container ports',
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      command: 'docker diff <container>',
+      description: 'Show changes made to files in a container',
+      example: 'docker diff my-container',
+      useCase: 'Track file system changes made during container execution',
+      icon: <FileText className="h-5 w-5" />
+    },
+    {
+      command: 'docker commit <container> <image>',
+      description: 'Create a new image from container changes',
+      example: 'docker commit my-container my-custom-image:v1.0',
+      useCase: 'Save container state as a new image for reuse or distribution',
+      icon: <Layers className="h-5 w-5" />
+    },
+    {
+      command: 'docker save -o <file> <image>',
+      description: 'Save image to a tar archive file',
+      example: 'docker save -o my-app.tar my-app:latest',
+      useCase: 'Export images for offline distribution or backup purposes',
+      icon: <Download className="h-5 w-5" />
+    },
+    {
+      command: 'docker load -i <file>',
+      description: 'Load image from a tar archive file',
+      example: 'docker load -i my-app.tar',
+      useCase: 'Import previously exported images from tar archives',
+      icon: <Upload className="h-5 w-5" />
+    },
+    {
+      command: 'docker history <image>',
+      description: 'Show the history and layers of an image',
+      example: 'docker history nginx:latest',
+      useCase: 'Understand how an image was built and optimize layer sizes',
+      icon: <Layers className="h-5 w-5" />
+    },
+    {
+      command: 'docker search <term>',
+      description: 'Search Docker Hub for images',
+      example: 'docker search nginx',
+      useCase: 'Find official and community images for your applications',
+      icon: <Globe className="h-5 w-5" />
+    }
+  ];
+
   const volumeMappingExamples = [
     {
       platform: 'macOS/Linux',
@@ -624,6 +746,66 @@ function App() {
                       {cmd.icon}
                     </div>
                     <h3 className="text-lg font-bold text-blue-300">{cmd.command}</h3>
+                  </div>
+                  
+                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                    {cmd.description}
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Example:</p>
+                      <div className="flex items-center gap-2 bg-gray-800/80 rounded-lg p-3 group/code">
+                        <code className="text-green-400 text-sm flex-1 font-mono">
+                          {cmd.example}
+                        </code>
+                        <button
+                          onClick={() => copyToClipboard(cmd.example)}
+                          className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
+                          title="Copy command"
+                        >
+                          {copiedCommand === cmd.example ? (
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Use Case:</p>
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        {cmd.useCase}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Advanced Docker Commands Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
+            Advanced <span className="text-blue-400">Docker Commands</span>
+          </h2>
+          <p className="text-xl text-gray-400 text-center mb-16">
+            Level up your Docker skills with these powerful commands for debugging, monitoring, and management
+          </p>
+          
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {advancedDockerCommands.map((cmd, index) => (
+              <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 overflow-hidden group">
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="text-purple-400 group-hover:text-purple-300 transition-colors">
+                      {cmd.icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-purple-300">{cmd.command}</h3>
                   </div>
                   
                   <p className="text-gray-300 mb-4 text-sm leading-relaxed">
