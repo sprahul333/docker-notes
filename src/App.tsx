@@ -1,1371 +1,615 @@
 import React, { useState } from 'react';
-import { 
-  Container, 
-  Server, 
-  Play, 
-  Square, 
-  RotateCcw, 
-  Download, 
-  Upload, 
-  Trash2, 
-  Copy, 
-  Monitor,
-  HardDrive,
-  Zap,
-  Shield,
-  Layers,
-  Terminal,
-  ChevronRight,
-  CheckCircle,
-  Apple,
-  Laptop,
-  Settings,
-  ExternalLink,
-  AlertCircle,
-  CheckSquare,
-  Code,
-  FileText,
-  Database,
-  Globe
-} from 'lucide-react';
+import { Container, Copy, CheckCircle, Terminal, Database, Globe, Settings, Play, Pause, Trash2, Download, Search, Network, HardDrive, TestTube } from 'lucide-react';
 
-function App() {
-  const [copiedCommand, setCopiedCommand] = useState<string>('');
+interface Command {
+  command: string;
+  description: string;
+  example?: string;
+}
 
- const copyToClipboard = (command: string) => {
-  navigator.clipboard.writeText(command);
-  setCopiedCommand(command);
-  const timeoutId = setTimeout(() => setCopiedCommand(''), 2000);
-  
-  // You might want to clear this timeout if component unmounts
-  return () => clearTimeout(timeoutId);
-};
+interface CommandSection {
+  title: string;
+  icon: React.ReactNode;
+  commands: Command[];
+  color: string;
+}
 
-  const dockerCommands = [
-    {
-      command: 'docker images',
-      description: 'Displays the list of images that are present in the system',
-      example: 'docker images',
-      useCase: 'Check what Docker images you have available locally before running containers',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker ps -a',
-      description: 'Displays the complete list of containers (running, stopped, etc.)',
-      example: 'docker ps -a',
-      useCase: 'Monitor all containers to understand your current Docker environment state',
-      icon: <Container className="h-5 w-5" />
-    },
-    {
-      command: 'docker ps',
-      description: 'Displays the list of running containers',
-      example: 'docker ps',
-      useCase: 'Quick check to see which containers are currently active and consuming resources',
-      icon: <Container className="h-5 w-5" />
-    },
-    {
-      command: 'docker stop <container>',
-      description: 'Stops the execution of the given container',
-      example: 'docker stop my-app-container',
-      useCase: 'Gracefully stop a running container when you need to perform maintenance',
-      icon: <Square className="h-5 w-5" />
-    },
-    {
-      command: 'docker start <container>',
-      description: 'Starts the execution of a stopped container',
-      example: 'docker start my-app-container',
-      useCase: 'Resume a previously stopped container without losing its state',
-      icon: <Play className="h-5 w-5" />
-    },
-    {
-      command: 'docker restart <container>',
-      description: 'Restart a container that is currently running or stopped',
-      example: 'docker restart my-app-container',
-      useCase: 'Apply configuration changes or recover from application errors',
-      icon: <RotateCcw className="h-5 w-5" />
-    },
-    {
-      command: 'docker-compose up -d',
-      description: 'Run docker compose file in detached mode',
-      example: 'docker-compose up -d',
-      useCase: 'Start multi-container applications defined in docker-compose.yml',
-      icon: <Server className="h-5 w-5" />
-    },
-    {
-      command: 'docker-compose down',
-      description: 'Shuts down all running containers in docker compose',
-      example: 'docker-compose down',
-      useCase: 'Clean shutdown of entire application stack including networks and volumes',
-      icon: <Square className="h-5 w-5" />
-    },
-    {
-      command: 'docker-compose up -d --scale',
-      description: 'Run docker compose file and scale specific containers',
-      example: 'docker-compose up -d --scale web=3',
-      useCase: 'Scale specific services to handle increased load or testing scenarios',
-      icon: <Server className="h-5 w-5" />
-    },
-    {
-      command: 'docker push <image>',
-      description: 'Pushes images to Docker Hub or registry',
-      example: 'docker push myusername/my-app:v1.0',
-      useCase: 'Share your custom Docker images with team members or deploy to production',
-      icon: <Upload className="h-5 w-5" />
-    },
-    {
-      command: 'docker pull <image>',
-      description: 'Pulls images from Docker Hub',
-      example: 'docker pull nginx:latest',
-      useCase: 'Download the latest version of an image for local development',
-      icon: <Download className="h-5 w-5" />
-    },
-    {
-      command: 'docker run <image>',
-      description: 'Runs a Docker image and creates a new container',
-      example: 'docker run -p 3000:3000 my-react-app',
-      useCase: 'Start a new container instance from an image with port mapping',
-      icon: <Play className="h-5 w-5" />
-    },
-    {
-      command: 'docker run --name <name>',
-      description: 'Runs docker image with a custom container name',
-      example: 'docker run --name my-web-app nginx:latest',
-      useCase: 'Create containers with meaningful names instead of random generated ones',
-      icon: <Play className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d <image>',
-      description: 'Runs the docker image as a background process',
-      example: 'docker run -d nginx:latest',
-      useCase: 'Run containers in the background without blocking your terminal',
-      icon: <Play className="h-5 w-5" />
-    },
-    {
-      command: 'docker run --rm <image>',
-      description: 'Runs docker image and removes container after execution',
-      example: 'docker run --rm ubuntu:latest echo "Hello World"',
-      useCase: 'Run temporary containers that clean up automatically after completion',
-      icon: <Play className="h-5 w-5" />
-    },
-    {
-      command: 'docker build -t <tag> .',
-      description: 'Builds a Docker image from Dockerfile',
-      example: 'docker build -t myapp:v1.0 .',
-      useCase: 'Create a custom Docker image from your application source code',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker tag <image> <tag>',
-      description: 'Tags an image for better version control',
-      example: 'docker tag myapp:latest myapp:v1.0',
-      useCase: 'Create version tags for your images to track different releases',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker rmi <image>',
-      description: 'Removes the docker image locally from the system',
-      example: 'docker rmi nginx:latest',
-      useCase: 'Clean up unused images to free disk space',
-      icon: <Trash2 className="h-5 w-5" />
-    },
-    {
-      command: 'docker rmi -f $(docker images -aq)',
-      description: 'Deletes all images that are present and not running',
-      example: 'docker rmi -f $(docker images -aq)',
-      useCase: 'Nuclear option to clean all unused images from your system',
-      icon: <Trash2 className="h-5 w-5" />
-    },
-    {
-      command: 'docker system prune -a',
-      description: 'Removes all unused containers, images, and build cache',
-      example: 'docker system prune -a',
-      useCase: 'Free up disk space by cleaning unused Docker resources',
-      icon: <Trash2 className="h-5 w-5" />
-    }
-  ];
+const CommandCard: React.FC<{ command: Command; color: string }> = ({ command, color }) => {
+  const [copied, setCopied] = useState(false);
 
-  const advancedDockerCommands = [
-    {
-      command: 'docker exec -it <container> <command>',
-      description: 'Execute a command inside a running container interactively',
-      example: 'docker exec -it my-container bash',
-      useCase: 'Debug issues, inspect files, or run commands inside running containers',
-      icon: <Terminal className="h-5 w-5" />
-    },
-    {
-      command: 'docker logs <container>',
-      description: 'View logs from a container',
-      example: 'docker logs --follow my-app-container',
-      useCase: 'Debug application issues by examining container output and error logs',
-      icon: <FileText className="h-5 w-5" />
-    },
-    {
-      command: 'docker inspect <container>',
-      description: 'Display detailed information about a container or image',
-      example: 'docker inspect my-container',
-      useCase: 'Get comprehensive metadata, network settings, and configuration details',
-      icon: <Settings className="h-5 w-5" />
-    },
-    {
-      command: 'docker cp <container>:<path> <host-path>',
-      description: 'Copy files between container and host filesystem',
-      example: 'docker cp my-container:/app/logs ./logs',
-      useCase: 'Extract files from containers or inject files into running containers',
-      icon: <Copy className="h-5 w-5" />
-    },
-    {
-      command: 'docker network ls',
-      description: 'List all Docker networks',
-      example: 'docker network ls',
-      useCase: 'View available networks for container communication and isolation',
-      icon: <Globe className="h-5 w-5" />
-    },
-    {
-      command: 'docker network create <network>',
-      description: 'Create a custom Docker network',
-      example: 'docker network create my-app-network',
-      useCase: 'Create isolated networks for multi-container applications',
-      icon: <Globe className="h-5 w-5" />
-    },
-    {
-      command: 'docker volume ls',
-      description: 'List all Docker volumes',
-      example: 'docker volume ls',
-      useCase: 'Manage persistent data storage across container lifecycles',
-      icon: <Database className="h-5 w-5" />
-    },
-    {
-      command: 'docker volume create <volume>',
-      description: 'Create a named volume for persistent storage',
-      example: 'docker volume create my-data-volume',
-      useCase: 'Create persistent storage that survives container removal',
-      icon: <Database className="h-5 w-5" />
-    },
-    {
-      command: 'docker stats',
-      description: 'Display real-time resource usage statistics for containers',
-      example: 'docker stats --no-stream',
-      useCase: 'Monitor CPU, memory, and network usage of running containers',
-      icon: <Monitor className="h-5 w-5" />
-    },
-    {
-      command: 'docker top <container>',
-      description: 'Display running processes inside a container',
-      example: 'docker top my-container',
-      useCase: 'Monitor what processes are running inside a specific container',
-      icon: <Monitor className="h-5 w-5" />
-    },
-    {
-      command: 'docker port <container>',
-      description: 'List port mappings for a container',
-      example: 'docker port my-web-app',
-      useCase: 'Check which host ports are mapped to container ports',
-      icon: <Globe className="h-5 w-5" />
-    },
-    {
-      command: 'docker diff <container>',
-      description: 'Show changes made to files in a container',
-      example: 'docker diff my-container',
-      useCase: 'Track file system changes made during container execution',
-      icon: <FileText className="h-5 w-5" />
-    },
-    {
-      command: 'docker commit <container> <image>',
-      description: 'Create a new image from container changes',
-      example: 'docker commit my-container my-custom-image:v1.0',
-      useCase: 'Save container state as a new image for reuse or distribution',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker save -o <file> <image>',
-      description: 'Save image to a tar archive file',
-      example: 'docker save -o my-app.tar my-app:latest',
-      useCase: 'Export images for offline distribution or backup purposes',
-      icon: <Download className="h-5 w-5" />
-    },
-    {
-      command: 'docker load -i <file>',
-      description: 'Load image from a tar archive file',
-      example: 'docker load -i my-app.tar',
-      useCase: 'Import previously exported images from tar archives',
-      icon: <Upload className="h-5 w-5" />
-    },
-    {
-      command: 'docker history <image>',
-      description: 'Show the history and layers of an image',
-      example: 'docker history nginx:latest',
-      useCase: 'Understand how an image was built and optimize layer sizes',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker search <term>',
-      description: 'Search Docker Hub for images',
-      example: 'docker search nginx',
-      useCase: 'Find official and community images for your applications',
-      icon: <Globe className="h-5 w-5" />
-    }
-  ];
-
-  const volumeMappingExamples = [
-    {
-      platform: 'macOS/Linux',
-      syntax: 'docker run -v ${PWD}/reports:/app/reports myapp:latest',
-      description: 'Maps the reports folder from current directory to container'
-    },
-    {
-      platform: 'Windows PowerShell',
-      syntax: 'docker run -v ${PWD}/reports:/app/reports myapp:latest',
-      description: 'PowerShell uses ${PWD} for current directory path'
-    },
-    {
-      platform: 'Windows Command Prompt',
-      syntax: 'docker run -v %cd%/reports:/app/reports myapp:latest',
-      description: 'Command Prompt uses %cd% for current directory path'
-    }
-  ];
-
-  const detailedVolumeExamples = [
-    {
-      title: 'Database Data Persistence',
-      command: 'docker run -d --name mysql-db -v mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret mysql:8.0',
-      description: 'Creates a named volume to persist MySQL database data across container restarts',
-      useCase: 'Essential for production databases where data must survive container updates',
-      icon: <Database className="h-5 w-5" />
-    },
-    {
-      title: 'Development Code Sync',
-      command: 'docker run -d -p 3000:3000 -v ${PWD}/src:/app/src node:18 npm run dev',
-      description: 'Bind mounts source code directory for live development with hot reload',
-      useCase: 'Development workflow where code changes reflect immediately in running container',
-      icon: <Code className="h-5 w-5" />
-    },
-    {
-      title: 'Log File Collection',
-      command: 'docker run -d --name web-server -v /host/logs:/var/log/nginx nginx:alpine',
-      description: 'Maps container logs to host directory for centralized log management',
-      useCase: 'Production monitoring and debugging by accessing logs from host system',
-      icon: <FileText className="h-5 w-5" />
-    },
-    {
-      title: 'Configuration Management',
-      command: 'docker run -d --name app -v ${PWD}/config:/app/config -v app-data:/app/data myapp:latest',
-      description: 'Combines bind mount for config files and named volume for application data',
-      useCase: 'Separate configuration management from data persistence in production apps',
-      icon: <Settings className="h-5 w-5" />
-    },
-    {
-      title: 'Backup and Restore',
-      command: 'docker run --rm -v postgres-data:/data -v ${PWD}/backup:/backup alpine tar czf /backup/db-backup.tar.gz /data',
-      description: 'Creates a backup of named volume data using a temporary container',
-      useCase: 'Regular database backups and disaster recovery procedures',
-      icon: <Download className="h-5 w-5" />
-    },
-    {
-      title: 'Shared Storage Between Containers',
-      command: 'docker run -d --name app1 -v shared-storage:/shared myapp:v1 && docker run -d --name app2 -v shared-storage:/shared myapp:v2',
-      description: 'Multiple containers sharing the same named volume for data exchange',
-      useCase: 'Microservices architecture where containers need to share files or data',
-      icon: <Server className="h-5 w-5" />
-    }
-  ];
-
-  const seleniumGridCommands = [
-    {
-      command: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-chrome:latest',
-      description: 'Run standalone Chrome browser for Selenium testing with VNC access',
-      example: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-chrome:latest',
-      useCase: 'Quick setup for single browser automated testing with visual debugging capability',
-      icon: <Globe className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-firefox:latest',
-      description: 'Run standalone Firefox browser for cross-browser testing',
-      example: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-firefox:latest',
-      useCase: 'Firefox-specific testing scenarios and cross-browser compatibility validation',
-      icon: <Globe className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d -p 4444:4444 --shm-size=2g selenium/hub:latest',
-      description: 'Start Selenium Grid Hub to coordinate multiple browser nodes',
-      example: 'docker run -d -p 4444:4444 --shm-size=2g selenium/hub:latest',
-      useCase: 'Central coordination point for distributed testing across multiple browser instances',
-      icon: <Server className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d --shm-size=2g selenium/node-chrome:latest',
-      description: 'Add Chrome node to existing Selenium Grid Hub',
-      example: 'docker run -d --shm-size=2g -e HUB_HOST=hub-container selenium/node-chrome:latest',
-      useCase: 'Scale testing capacity by adding Chrome browser nodes to the grid',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d --shm-size=2g selenium/node-firefox:latest',
-      description: 'Add Firefox node to existing Selenium Grid Hub',
-      example: 'docker run -d --shm-size=2g -e HUB_HOST=hub-container selenium/node-firefox:latest',
-      useCase: 'Multi-browser testing by adding Firefox nodes alongside Chrome nodes',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d --shm-size=2g selenium/node-edge:latest',
-      description: 'Add Microsoft Edge node to Selenium Grid for comprehensive browser testing',
-      example: 'docker run -d --shm-size=2g -e HUB_HOST=hub-container selenium/node-edge:latest',
-      useCase: 'Complete cross-browser testing including Microsoft Edge browser',
-      icon: <Layers className="h-5 w-5" />
-    },
-    {
-      command: 'docker-compose up -d',
-      description: 'Start complete Selenium Grid with Hub and multiple browser nodes using docker-compose',
-      example: 'docker-compose -f selenium-grid-compose.yml up -d --scale chrome=3 --scale firefox=2',
-      useCase: 'Production-ready Selenium Grid setup with multiple browser instances and easy scaling',
-      icon: <Server className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d -v /dev/shm:/dev/shm selenium/standalone-chrome:latest',
-      description: 'Run Chrome with shared memory volume for better performance',
-      example: 'docker run -d -p 4444:4444 -v /dev/shm:/dev/shm selenium/standalone-chrome:latest',
-      useCase: 'Optimize browser performance by using host shared memory instead of --shm-size',
-      icon: <Zap className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d -e SE_OPTS="--log-level INFO" selenium/hub:latest',
-      description: 'Configure Selenium Hub with custom logging and options',
-      example: 'docker run -d -p 4444:4444 -e SE_OPTS="--log-level DEBUG --throw-on-capability-not-present" selenium/hub:latest',
-      useCase: 'Debug Selenium Grid issues with detailed logging and strict capability matching',
-      icon: <Settings className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d -p 5900:5900 selenium/standalone-chrome-debug:latest',
-      description: 'Run Chrome with VNC server for visual debugging of test execution',
-      example: 'docker run -d -p 4444:4444 -p 5900:5900 selenium/standalone-chrome-debug:latest',
-      useCase: 'Visual debugging of automated tests by connecting via VNC to see browser actions',
-      icon: <Monitor className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d -v ${PWD}/downloads:/home/seluser/Downloads selenium/standalone-chrome:latest',
-      description: 'Map downloads directory to access files downloaded during test execution',
-      example: 'docker run -d -p 4444:4444 -v ${PWD}/test-downloads:/home/seluser/Downloads selenium/standalone-chrome:latest',
-      useCase: 'Test file download functionality and verify downloaded files from host system',
-      icon: <Download className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d --network selenium-grid selenium/node-chrome:latest',
-      description: 'Run browser nodes on custom Docker network for better isolation',
-      example: 'docker network create selenium-grid && docker run -d --network selenium-grid --name chrome-node selenium/node-chrome:latest',
-      useCase: 'Network isolation and better container communication in complex test environments',
-      icon: <Globe className="h-5 w-5" />
-    },
-    {
-      command: 'docker run -d -e SE_NODE_MAX_INSTANCES=3 selenium/node-chrome:latest',
-      description: 'Configure maximum concurrent browser instances per node',
-      example: 'docker run -d -e SE_NODE_MAX_INSTANCES=5 -e SE_NODE_MAX_SESSIONS=5 selenium/node-chrome:latest',
-      useCase: 'Optimize resource usage by controlling concurrent test execution per container',
-      icon: <Settings className="h-5 w-5" />
-    },
-    {
-      command: 'docker run --rm -v ${PWD}/tests:/tests selenium/standalone-chrome:latest',
-      description: 'Run tests with volume mapping and auto-cleanup after execution',
-      example: 'docker run --rm -v ${PWD}/selenium-tests:/workspace -w /workspace selenium/standalone-chrome:latest python test_suite.py',
-      useCase: 'Execute test suites with automatic container cleanup and access to test files',
-      icon: <Play className="h-5 w-5" />
-    }
-  ];
-  const installationSteps = {
-    windows: [
-      {
-        step: 1,
-        title: 'System Requirements',
-        content: 'Windows 10 64-bit: Pro, Enterprise, or Education (Build 16299 or later) or Windows 11',
-        icon: <CheckSquare className="h-5 w-5" />
-      },
-      {
-        step: 2,
-        title: 'Enable WSL 2',
-        content: 'Enable Windows Subsystem for Linux (WSL) 2 feature in Windows Features',
-        icon: <Settings className="h-5 w-5" />
-      },
-      {
-        step: 3,
-        title: 'Download Docker Desktop',
-        content: 'Download Docker Desktop for Windows from the official Docker website',
-        icon: <Download className="h-5 w-5" />
-      },
-      {
-        step: 4,
-        title: 'Install and Configure',
-        content: 'Run the installer and follow the setup wizard. Restart when prompted',
-        icon: <CheckCircle className="h-5 w-5" />
-      }
-    ],
-    mac: [
-      {
-        step: 1,
-        title: 'System Requirements',
-        content: 'macOS 10.15 or newer (Intel) or macOS 11 or newer (Apple Silicon)',
-        icon: <CheckSquare className="h-5 w-5" />
-      },
-      {
-        step: 2,
-        title: 'Download Docker Desktop',
-        content: 'Download Docker Desktop for Mac (Intel or Apple Silicon) from Docker Hub',
-        icon: <Download className="h-5 w-5" />
-      },
-      {
-        step: 3,
-        title: 'Install Application',
-        content: 'Drag Docker.app to Applications folder and launch it',
-        icon: <CheckCircle className="h-5 w-5" />
-      },
-      {
-        step: 4,
-        title: 'Grant Permissions',
-        content: 'Allow Docker Desktop to access your system when prompted',
-        icon: <Shield className="h-5 w-5" />
-      }
-    ],
-    linux: [
-      {
-        step: 1,
-        title: 'Update Package Index',
-        content: 'sudo apt-get update && sudo apt-get install ca-certificates curl gnupg',
-        icon: <Terminal className="h-5 w-5" />
-      },
-      {
-        step: 2,
-        title: 'Add Docker GPG Key',
-        content: 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg',
-        icon: <Shield className="h-5 w-5" />
-      },
-      {
-        step: 3,
-        title: 'Add Repository',
-        content: 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null',
-        icon: <Database className="h-5 w-5" />
-      },
-      {
-        step: 4,
-        title: 'Install Docker Engine',
-        content: 'sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io',
-        icon: <CheckCircle className="h-5 w-5" />
-      }
-    ]
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const [selectedPlatform, setSelectedPlatform] = useState<'windows' | 'mac' | 'linux'>('windows');
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4">
-
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent opacity-20"></div>
-        
-        <div className="max-w-6xl mx-auto text-center relative">
-          <div className="mb-8 flex justify-center">
-            <div className="p-4 bg-blue-500/20 rounded-full backdrop-blur-sm border border-blue-400/30">
-              <Container className="h-16 w-16 text-blue-400" />
-            </div>
-          </div>
-          
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent">
-            Master Docker
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-            From dual-boot frustrations to seamless containerization. Learn Docker from the ground up 
-            with comprehensive commands, real-world examples, and best practices.
-          </p>
-          
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <a 
-              href="#installation" 
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25"
-            >
-              Install Docker
-            </a>
-            <a 
-              href="#commands" 
-              className="px-8 py-4 border-2 border-gray-400 hover:border-white rounded-lg text-lg font-semibold transition-all duration-300 hover:bg-white hover:text-gray-900"
-            >
-              View Commands
-            </a>
-          </div>
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+      <div className="flex items-start justify-between mb-3">
+        <code className={`text-sm font-mono ${color} bg-gray-50 px-3 py-1 rounded`}>
+          {command.command}
+        </code>
+        <button
+          onClick={() => copyToClipboard(command.command)}
+          className="ml-2 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+          title="Copy command"
+        >
+          {copied ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+        </button>
+      </div>
+      <p className="text-gray-700 mb-3">{command.description}</p>
+      {command.example && (
+        <div className="bg-gray-50 rounded p-3">
+          <p className="text-sm text-gray-600 mb-1">Example:</p>
+          <code className="text-xs text-gray-800 block">{command.example}</code>
         </div>
-      </section>
-
-      {/* Evolution Timeline */}
-      <section className="py-20 px-4 bg-gray-800/50 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
-            The Evolution: From Dual Boot to <span className="text-blue-400">Containers</span>
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-8 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-2xl border border-red-500/20">
-              <div className="mb-6 flex justify-center">
-                <div className="p-3 bg-red-500/20 rounded-full">
-                  <Monitor className="h-8 w-8 text-red-400" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-red-300">The Dual Boot Era</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Developers had to install multiple operating systems on their machines, 
-                switching between them to test applications. This was time-consuming, 
-                resource-intensive, and often led to compatibility issues.
-              </p>
-            </div>
-            
-            <div className="text-center p-8 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 rounded-2xl border border-yellow-500/20">
-              <div className="mb-6 flex justify-center">
-                <div className="p-3 bg-yellow-500/20 rounded-full">
-                  <HardDrive className="h-8 w-8 text-yellow-400" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-yellow-300">Virtual Machines</h3>
-              <p className="text-gray-300 leading-relaxed">
-                VMs provided isolation but were heavy on resources, slow to start, 
-                and required significant overhead for each instance. Managing multiple 
-                VMs became complex and expensive.
-              </p>
-            </div>
-            
-            <div className="text-center p-8 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-2xl border border-blue-500/20">
-              <div className="mb-6 flex justify-center">
-                <div className="p-3 bg-blue-500/20 rounded-full">
-                  <Container className="h-8 w-8 text-blue-400" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-blue-300">Docker Revolution</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Containers share the host OS kernel, making them lightweight, fast, 
-                and efficient. Applications run consistently across any environment, 
-                from development to production.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Docker Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
-            Why <span className="text-blue-400">Docker?</span>
-          </h2>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: <Zap className="h-8 w-8" />,
-                title: 'Lightning Fast',
-                description: 'Start containers in seconds, not minutes'
-              },
-              {
-                icon: <Shield className="h-8 w-8" />,
-                title: 'Consistent',
-                description: 'Same environment across dev, test, and production'
-              },
-              {
-                icon: <Layers className="h-8 w-8" />,
-                title: 'Portable',
-                description: 'Run anywhere - laptop, server, or cloud'
-              },
-              {
-                icon: <Server className="h-8 w-8" />,
-                title: 'Scalable',
-                description: 'Easily scale applications up or down'
-              }
-            ].map((benefit, index) => (
-              <div key={index} className="p-6 bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 group">
-                <div className="text-blue-400 mb-4 group-hover:text-blue-300 transition-colors">
-                  {benefit.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-                <p className="text-gray-400 text-sm">{benefit.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Docker Desktop Installation Section */}
-      <section id="installation" className="py-20 px-4 bg-gray-800/30">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            Install <span className="text-blue-400">Docker Desktop</span>
-          </h2>
-          <p className="text-xl text-gray-400 text-center mb-16">
-            Get started with Docker by installing Docker Desktop on your operating system
-          </p>
-          
-          {/* Platform Selection */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-gray-800/50 rounded-lg p-2 flex gap-2">
-              <button
-                onClick={() => setSelectedPlatform('windows')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-300 ${
-                  selectedPlatform === 'windows' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                <Laptop className="h-5 w-5" />
-                Windows
-              </button>
-              <button
-                onClick={() => setSelectedPlatform('mac')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-300 ${
-                  selectedPlatform === 'mac' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                <Apple className="h-5 w-5" />
-                macOS
-              </button>
-              <button
-                onClick={() => setSelectedPlatform('linux')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-300 ${
-                  selectedPlatform === 'linux' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                <Terminal className="h-5 w-5" />
-                Linux
-              </button>
-            </div>
-          </div>
-
-          {/* Installation Steps */}
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              {installationSteps[selectedPlatform].map((step, index) => (
-                <div key={index} className="flex gap-4 p-6 bg-gray-900/50 rounded-xl border border-gray-700/50">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
-                      {step.step}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="text-blue-400">
-                        {step.icon}
-                      </div>
-                      <h3 className="text-lg font-bold text-blue-300">{step.title}</h3>
-                    </div>
-                    <p className="text-gray-300 text-sm leading-relaxed">{step.content}</p>
-                    {selectedPlatform === 'linux' && step.step > 1 && (
-                      <div className="mt-3 bg-gray-800/80 rounded-lg p-3">
-                        <code className="text-green-400 text-xs font-mono break-all">
-                          {step.content}
-                        </code>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-6">
-              {/* Download Links */}
-              <div className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl border border-blue-500/20">
-                <h3 className="text-xl font-bold mb-4 text-blue-300">Official Download Links</h3>
-                <div className="space-y-3">
-                  <a 
-                    href="https://www.docker.com/products/docker-desktop/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors group"
-                  >
-                    <Download className="h-5 w-5 text-blue-400" />
-                    <span className="flex-1">Docker Desktop Official Page</span>
-                    <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-400" />
-                  </a>
-                  <a 
-                    href="https://docs.docker.com/get-docker/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors group"
-                  >
-                    <Settings className="h-5 w-5 text-blue-400" />
-                    <span className="flex-1">Installation Documentation</span>
-                    <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-400" />
-                  </a>
-                </div>
-              </div>
-
-              {/* System Requirements */}
-              <div className="p-6 bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 rounded-xl border border-yellow-500/20">
-                <h3 className="text-xl font-bold mb-4 text-yellow-300">System Requirements</h3>
-                <div className="space-y-2 text-sm text-gray-300">
-                  {selectedPlatform === 'windows' && (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>Windows 10/11 64-bit</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>WSL 2 feature enabled</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>4GB RAM minimum</span>
-                      </div>
-                    </>
-                  )}
-                  {selectedPlatform === 'mac' && (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>macOS 10.15+ (Intel) or 11+ (Apple Silicon)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>4GB RAM minimum</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>VirtualBox prior to version 4.3.30 must be uninstalled</span>
-                      </div>
-                    </>
-                  )}
-                  {selectedPlatform === 'linux' && (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>64-bit kernel and CPU support</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>KVM virtualization support</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckSquare className="h-4 w-4 text-green-400" />
-                        <span>QEMU must be version 5.2 or newer</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Post Installation */}
-              <div className="p-6 bg-gradient-to-br from-green-500/10 to-green-600/5 rounded-xl border border-green-500/20">
-                <h3 className="text-xl font-bold mb-4 text-green-300">After Installation</h3>
-                <div className="space-y-2 text-sm text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-green-400" />
-                    <span>Verify installation: <code className="text-green-400 font-mono">docker --version</code></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-green-400" />
-                    <span>Test with: <code className="text-green-400 font-mono">docker run hello-world</code></span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-green-400" />
-                    <span>Docker Desktop should appear in system tray/menu bar</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Docker Commands Section */}
-      <section id="commands" className="py-20 px-4 bg-gray-800/30">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            Essential <span className="text-blue-400">Docker Commands</span>
-          </h2>
-          <p className="text-xl text-gray-400 text-center mb-16">
-            Master these commands to become productive with Docker
-          </p>
-          
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {dockerCommands.map((cmd, index) => (
-              <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 overflow-hidden group">
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="text-blue-400 group-hover:text-blue-300 transition-colors">
-                      {cmd.icon}
-                    </div>
-                    <h3 className="text-lg font-bold text-blue-300">{cmd.command}</h3>
-                  </div>
-                  
-                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                    {cmd.description}
-                  </p>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Example:</p>
-                      <div className="flex items-center gap-2 bg-gray-800/80 rounded-lg p-3 group/code">
-                        <code className="text-green-400 text-sm flex-1 font-mono">
-                          {cmd.example}
-                        </code>
-                        <button
-                          onClick={() => copyToClipboard(cmd.example)}
-                          className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
-                          title="Copy command"
-                        >
-                          {copiedCommand === cmd.example ? (
-                            <CheckCircle className="h-4 w-4 text-green-400" />
-                          ) : (
-                            <Copy className="h-4 w-4 text-gray-400" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Use Case:</p>
-                      <p className="text-xs text-gray-400 leading-relaxed">
-                        {cmd.useCase}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Advanced Docker Commands Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            Advanced <span className="text-blue-400">Docker Commands</span>
-          </h2>
-          <p className="text-xl text-gray-400 text-center mb-16">
-            Level up your Docker skills with these powerful commands for debugging, monitoring, and management
-          </p>
-          
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {advancedDockerCommands.map((cmd, index) => (
-              <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 overflow-hidden group">
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="text-purple-400 group-hover:text-purple-300 transition-colors">
-                      {cmd.icon}
-                    </div>
-                    <h3 className="text-lg font-bold text-purple-300">{cmd.command}</h3>
-                  </div>
-                  
-                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                    {cmd.description}
-                  </p>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Example:</p>
-                      <div className="flex items-center gap-2 bg-gray-800/80 rounded-lg p-3 group/code">
-                        <code className="text-green-400 text-sm flex-1 font-mono">
-                          {cmd.example}
-                        </code>
-                        <button
-                          onClick={() => copyToClipboard(cmd.example)}
-                          className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded"
-                          title="Copy command"
-                        >
-                          {copiedCommand === cmd.example ? (
-                            <CheckCircle className="h-4 w-4 text-green-400" />
-                          ) : (
-                            <Copy className="h-4 w-4 text-gray-400" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Use Case:</p>
-                      <p className="text-xs text-gray-400 leading-relaxed">
-                        {cmd.useCase}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Volume Mapping Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            <span className="text-blue-400">Volume Mapping</span>
-          </h2>
-          <p className="text-xl text-gray-400 text-center mb-16 max-w-4xl mx-auto">
-            Link directories between your host machine and containers to persist data 
-            and share files seamlessly across different environments.
-          </p>
-          
-          <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8 mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-center">What is Volume Mapping?</h3>
-            <p className="text-gray-300 text-lg leading-relaxed text-center max-w-4xl mx-auto mb-6">
-              Volume mapping allows you to link a directory or file on your host machine to a directory 
-              within a container. This enables data sharing between the container and host system, 
-              ensuring that important files like reports, logs, or databases persist even when containers are stopped or removed.
-            </p>
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
-              <h4 className="text-lg font-bold text-yellow-300 mb-3">Important Note:</h4>
-              <p className="text-gray-300 leading-relaxed">
-                Any files generated during container execution (like reports, logs, or test results) 
-                will remain inside the container by default. Volume mapping ensures these files 
-                are accessible on your host machine and persist even after the container is removed.
-                Similarly, you might not have Chrome or Firefox browser mapped in the Linux OS, 
-                which is where volume mapping becomes essential.
-              </p>
-            </div>
-          </div>
-          
-          {/* Basic Volume Mapping Examples */}
-          <h3 className="text-3xl font-bold text-center mb-8 text-blue-300">Basic Volume Mapping Syntax</h3>
-          <div className="grid md:grid-cols-3 gap-6">
-            {volumeMappingExamples.map((example, index) => (
-              <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6 group hover:border-blue-500/50 transition-all duration-300">
-                <div className="flex items-center gap-3 mb-4">
-                  <Terminal className="h-5 w-5 text-blue-400" />
-                  <h3 className="text-lg font-bold text-blue-300">{example.platform}</h3>
-                </div>
-                
-                <div className="mb-4">
-                  <div className="bg-gray-800/80 rounded-lg p-4 group/code">
-                    <div className="flex items-center gap-2">
-                      <code className="text-green-400 text-sm flex-1 font-mono break-all">
-                        {example.syntax}
-                      </code>
-                      <button
-                        onClick={() => copyToClipboard(example.syntax)}
-                        className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded flex-shrink-0"
-                        title="Copy command"
-                      >
-                        {copiedCommand === example.syntax ? (
-                          <CheckCircle className="h-4 w-4 text-green-400" />
-                        ) : (
-                          <Copy className="h-4 w-4 text-gray-400" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {example.description}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Detailed Volume Examples */}
-          <div className="mt-20">
-            <h3 className="text-3xl font-bold text-center mb-8 text-blue-300">Real-World Volume Examples</h3>
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {detailedVolumeExamples.map((example, index) => (
-                <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 overflow-hidden group">
-                  <div className="p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="text-green-400 group-hover:text-green-300 transition-colors">
-                        {example.icon}
-                      </div>
-                      <h4 className="text-lg font-bold text-green-300">{example.title}</h4>
-                    </div>
-                    
-                    <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                      {example.description}
-                    </p>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Command:</p>
-                        <div className="flex items-center gap-2 bg-gray-800/80 rounded-lg p-3 group/code">
-                          <code className="text-green-400 text-xs flex-1 font-mono break-all">
-                            {example.command}
-                          </code>
-                          <button
-                            onClick={() => copyToClipboard(example.command)}
-                            className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded flex-shrink-0"
-                            title="Copy command"
-                          >
-                            {copiedCommand === example.command ? (
-                              <CheckCircle className="h-4 w-4 text-green-400" />
-                            ) : (
-                              <Copy className="h-4 w-4 text-gray-400" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Use Case:</p>
-                        <p className="text-xs text-gray-400 leading-relaxed">
-                          {example.useCase}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Selenium Grid Section */}
-      <section className="py-20 px-4 bg-gray-800/30">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            <span className="text-orange-400">Selenium Grid</span> with Docker
-          </h2>
-          <p className="text-xl text-gray-400 text-center mb-8 max-w-4xl mx-auto">
-            Run automated browser testing at scale using Selenium Grid in Docker containers
-          </p>
-          
-          {/* Selenium Grid Info */}
-          <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-2xl border border-orange-500/20 p-8 mb-12">
-            <h3 className="text-2xl font-bold mb-6 text-center text-orange-300">What is Selenium Grid?</h3>
-            <p className="text-gray-300 text-lg leading-relaxed text-center max-w-4xl mx-auto mb-6">
-              Selenium Grid allows you to run tests on different machines against different browsers in parallel. 
-              With Docker, you can easily spin up browser instances without installing browsers locally, 
-              making your testing environment consistent and scalable.
-            </p>
-            <div className="grid md:grid-cols-3 gap-6 mt-8">
-              <div className="text-center p-4 bg-orange-500/10 rounded-xl">
-                <Globe className="h-8 w-8 text-orange-400 mx-auto mb-3" />
-                <h4 className="font-bold text-orange-300 mb-2">Cross-Browser Testing</h4>
-                <p className="text-sm text-gray-400">Test on Chrome, Firefox, Edge, and Safari simultaneously</p>
-              </div>
-              <div className="text-center p-4 bg-orange-500/10 rounded-xl">
-                <Server className="h-8 w-8 text-orange-400 mx-auto mb-3" />
-                <h4 className="font-bold text-orange-300 mb-2">Parallel Execution</h4>
-                <p className="text-sm text-gray-400">Run multiple tests concurrently to reduce execution time</p>
-              </div>
-              <div className="text-center p-4 bg-orange-500/10 rounded-xl">
-                <Monitor className="h-8 w-8 text-orange-400 mx-auto mb-3" />
-                <h4 className="font-bold text-orange-300 mb-2">Visual Debugging</h4>
-                <p className="text-sm text-gray-400">VNC access to see tests running in real-time</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {seleniumGridCommands.map((cmd, index) => (
-              <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 overflow-hidden group">
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="text-orange-400 group-hover:text-orange-300 transition-colors">
-                      {cmd.icon}
-                    </div>
-                    <h3 className="text-lg font-bold text-orange-300">{cmd.command.split(' ')[0]} {cmd.command.split(' ')[1]}</h3>
-                  </div>
-                  
-                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
-                    {cmd.description}
-                  </p>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Example:</p>
-                      <div className="flex items-center gap-2 bg-gray-800/80 rounded-lg p-3 group/code">
-                        <code className="text-green-400 text-xs flex-1 font-mono break-all">
-                          {cmd.example}
-                        </code>
-                        <button
-                          onClick={() => copyToClipboard(cmd.example)}
-                          className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded flex-shrink-0"
-                          title="Copy command"
-                        >
-                          {copiedCommand === cmd.example ? (
-                            <CheckCircle className="h-4 w-4 text-green-400" />
-                          ) : (
-                            <Copy className="h-4 w-4 text-gray-400" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs text-gray-500 mb-1">Use Case:</p>
-                      <p className="text-xs text-gray-400 leading-relaxed">
-                        {cmd.useCase}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Selenium Grid Docker Compose Example */}
-          <div className="mt-12 bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8">
-            <h3 className="text-2xl font-bold mb-6 text-center text-orange-300">Complete Selenium Grid Setup</h3>
-            <p className="text-gray-300 text-center mb-6">
-              Use this docker-compose.yml file to set up a complete Selenium Grid with Hub and multiple browser nodes:
-            </p>
-            <div className="bg-gray-800/80 rounded-lg p-6 group/code">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-gray-400">docker-compose.yml</span>
-                <button
-                  onClick={() => copyToClipboard(`version: '3.8'
-services:
-  selenium-hub:
-    image: selenium/hub:latest
-    container_name: selenium-hub
-    ports:
-      - "4444:4444"
-      - "4442:4442"
-      - "4443:4443"
-
-  chrome:
-    image: selenium/node-chrome:latest
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-    scale: 3
-
-  firefox:
-    image: selenium/node-firefox:latest
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-    scale: 2
-
-  edge:
-    image: selenium/node-edge:latest
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444`)}
-                  className="opacity-0 group-hover/code:opacity-100 transition-opacity p-2 hover:bg-gray-700 rounded"
-                  title="Copy docker-compose.yml"
-                >
-                  <Copy className="h-4 w-4 text-gray-400" />
-                </button>
-              </div>
-              <pre className="text-green-400 text-sm font-mono overflow-x-auto">
-{`version: '3.8'
-services:
-  selenium-hub:
-    image: selenium/hub:latest
-    container_name: selenium-hub
-    ports:
-      - "4444:4444"
-      - "4442:4442"
-      - "4443:4443"
-
-  chrome:
-    image: selenium/node-chrome:latest
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-    scale: 3
-
-  firefox:
-    image: selenium/node-firefox:latest
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444
-    scale: 2
-
-  edge:
-    image: selenium/node-edge:latest
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - HUB_HOST=selenium-hub
-      - HUB_PORT=4444`}
-              </pre>
-            </div>
-            <div className="mt-6 grid md:grid-cols-2 gap-4">
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
-                <h4 className="font-bold text-blue-300 mb-2">🚀 Quick Start:</h4>
-                <code className="text-sm text-green-400">docker-compose up -d</code>
-              </div>
-              <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
-                <h4 className="font-bold text-green-300 mb-2">🌐 Access Grid:</h4>
-                <code className="text-sm text-green-400">http://localhost:4444</code>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Getting Started Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600/10 to-purple-600/10">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-8">
-            Ready to Start Your <span className="text-blue-400">Docker Journey?</span>
-          </h2>
-          
-          <p className="text-xl text-gray-300 mb-12 leading-relaxed">
-            Master containerization with hands-on examples, best practices, and real-world scenarios. 
-            Join millions of developers who have revolutionized their deployment workflows with Docker.
-          </p>
-          
-          <div className="flex flex-col md:flex-row gap-4 justify-center mb-12">
-            <a 
-              href="https://docs.docker.com/reference/cli/docker/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25"
-            >
-              Official Docker Docs
-              <ChevronRight className="h-5 w-5" />
-            </a>
-            <a 
-              href="https://www.docker.com/products/docker-desktop/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="px-8 py-4 border-2 border-gray-400 hover:border-white rounded-lg text-lg font-semibold transition-all duration-300 hover:bg-white hover:text-gray-900"
-            >
-              Download Docker
-            </a>
-          </div>
-          
-          <p className="text-gray-400">
-            Need help? Check out the comprehensive Docker CLI reference for advanced commands and options.
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 bg-gray-900/80 backdrop-blur-sm border-t border-gray-700/50">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="mb-8">
-            <Container className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-2">Docker Mastery Guide</h3>
-            <p className="text-gray-400">
-              Your comprehensive resource for learning Docker from basics to advanced concepts
-            </p>
-          </div>
-          
-          <div className="text-gray-500 text-sm">
-            <p>© 2025 Docker Guide. Built for developers, by developers.</p>
-            <p className="mt-2">
-              Powered by modern web technologies and designed for the best learning experience.
-            </p>
-          </div>
-        </div>
-      </footer>
+      )}
     </div>
   );
-}
+};
+
+const App: React.FC = () => {
+  const commandSections: CommandSection[] = [
+    {
+      title: "Essential Docker Commands",
+      icon: <Container className="w-6 h-6" />,
+      color: "text-blue-600",
+      commands: [
+        {
+          command: "docker --version",
+          description: "Check Docker version and verify installation",
+          example: "Docker version 24.0.6, build ed223bc"
+        },
+        {
+          command: "docker pull <image>",
+          description: "Download an image from Docker Hub",
+          example: "docker pull nginx:latest"
+        },
+        {
+          command: "docker images",
+          description: "List all downloaded images on your system",
+          example: "Shows repository, tag, image ID, created date, and size"
+        },
+        {
+          command: "docker run <image>",
+          description: "Create and start a new container from an image",
+          example: "docker run -d -p 80:80 nginx"
+        },
+        {
+          command: "docker ps",
+          description: "List all currently running containers",
+          example: "Shows container ID, image, command, status, ports, and names"
+        },
+        {
+          command: "docker ps -a",
+          description: "List all containers (running and stopped)",
+          example: "Includes exited containers with their exit codes"
+        },
+        {
+          command: "docker stop <container>",
+          description: "Gracefully stop a running container",
+          example: "docker stop my-nginx-container"
+        },
+        {
+          command: "docker start <container>",
+          description: "Start a stopped container",
+          example: "docker start my-nginx-container"
+        },
+        {
+          command: "docker restart <container>",
+          description: "Restart a running container",
+          example: "docker restart my-nginx-container"
+        },
+        {
+          command: "docker rm <container>",
+          description: "Remove a stopped container permanently",
+          example: "docker rm my-nginx-container"
+        },
+        {
+          command: "docker rmi <image>",
+          description: "Remove an image from your system",
+          example: "docker rmi nginx:latest"
+        },
+        {
+          command: "docker build -t <name> .",
+          description: "Build an image from a Dockerfile in current directory",
+          example: "docker build -t my-app:v1.0 ."
+        }
+      ]
+    },
+    {
+      title: "Advanced Docker Operations",
+      icon: <Settings className="w-6 h-6" />,
+      color: "text-purple-600",
+      commands: [
+        {
+          command: "docker exec -it <container> /bin/bash",
+          description: "Access running container with interactive terminal",
+          example: "docker exec -it my-app /bin/bash"
+        },
+        {
+          command: "docker logs <container>",
+          description: "View container logs and output",
+          example: "docker logs -f my-app (follow logs in real-time)"
+        },
+        {
+          command: "docker inspect <container>",
+          description: "Get detailed information about container configuration",
+          example: "docker inspect my-app | grep IPAddress"
+        },
+        {
+          command: "docker cp <src> <container>:<dest>",
+          description: "Copy files between host and container",
+          example: "docker cp ./config.json my-app:/app/config.json"
+        },
+        {
+          command: "docker stats",
+          description: "Display real-time resource usage statistics",
+          example: "Shows CPU, memory, network I/O, and disk I/O usage"
+        },
+        {
+          command: "docker top <container>",
+          description: "Display running processes inside a container",
+          example: "docker top my-app"
+        },
+        {
+          command: "docker diff <container>",
+          description: "Show changes made to container's filesystem",
+          example: "docker diff my-app"
+        },
+        {
+          command: "docker network ls",
+          description: "List all Docker networks",
+          example: "Shows bridge, host, and custom networks"
+        },
+        {
+          command: "docker network create <name>",
+          description: "Create a custom Docker network",
+          example: "docker network create my-network"
+        },
+        {
+          command: "docker port <container>",
+          description: "Show port mappings for a container",
+          example: "docker port my-nginx"
+        },
+        {
+          command: "docker volume ls",
+          description: "List all Docker volumes",
+          example: "Shows volume names and drivers"
+        },
+        {
+          command: "docker volume create <name>",
+          description: "Create a named volume for persistent data",
+          example: "docker volume create my-data"
+        },
+        {
+          command: "docker commit <container> <image>",
+          description: "Create a new image from container changes",
+          example: "docker commit my-app my-app:v2.0"
+        },
+        {
+          command: "docker save -o <file> <image>",
+          description: "Export image to a tar archive",
+          example: "docker save -o my-app.tar my-app:latest"
+        },
+        {
+          command: "docker load -i <file>",
+          description: "Import image from a tar archive",
+          example: "docker load -i my-app.tar"
+        },
+        {
+          command: "docker history <image>",
+          description: "Show the history and layers of an image",
+          example: "docker history nginx:latest"
+        },
+        {
+          command: "docker search <term>",
+          description: "Search for images on Docker Hub",
+          example: "docker search nginx"
+        }
+      ]
+    },
+    {
+      title: "Docker Volume Management",
+      icon: <HardDrive className="w-6 h-6" />,
+      color: "text-green-600",
+      commands: [
+        {
+          command: "docker run -v /host/path:/container/path <image>",
+          description: "Mount host directory to container (bind mount)",
+          example: "docker run -v /home/user/data:/app/data nginx"
+        },
+        {
+          command: "docker run -v volume_name:/container/path <image>",
+          description: "Mount named volume to container",
+          example: "docker run -v my-data:/app/data nginx"
+        },
+        {
+          command: "docker run -v /container/path <image>",
+          description: "Create anonymous volume for container path",
+          example: "docker run -v /app/data nginx"
+        },
+        {
+          command: "docker volume inspect <volume>",
+          description: "Display detailed information about a volume",
+          example: "docker volume inspect my-data"
+        },
+        {
+          command: "docker volume rm <volume>",
+          description: "Remove a volume (must not be in use)",
+          example: "docker volume rm my-data"
+        },
+        {
+          command: "docker volume prune",
+          description: "Remove all unused volumes",
+          example: "Cleans up dangling volumes to free disk space"
+        }
+      ]
+    },
+    {
+      title: "Selenium Grid with Docker",
+      icon: <TestTube className="w-6 h-6" />,
+      color: "text-orange-600",
+      commands: [
+        {
+          command: "docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-chrome",
+          description: "Run standalone Chrome browser with VNC access",
+          example: "Access at http://localhost:4444 (Grid) and http://localhost:7900 (VNC)"
+        },
+        {
+          command: "docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-firefox",
+          description: "Run standalone Firefox browser with VNC access",
+          example: "VNC password: secret"
+        },
+        {
+          command: "docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-edge",
+          description: "Run standalone Edge browser with VNC access",
+          example: "Latest Microsoft Edge browser for testing"
+        },
+        {
+          command: "docker run -d -p 4442-4444:4442-4444 --name selenium-hub selenium/hub",
+          description: "Start Selenium Grid Hub for distributed testing",
+          example: "Hub coordinates multiple browser nodes"
+        },
+        {
+          command: "docker run -d --link selenium-hub:hub selenium/node-chrome",
+          description: "Add Chrome node to existing Grid Hub",
+          example: "Connects automatically to linked hub"
+        },
+        {
+          command: "docker run -d --link selenium-hub:hub selenium/node-firefox",
+          description: "Add Firefox node to existing Grid Hub",
+          example: "Scales testing across multiple browsers"
+        },
+        {
+          command: "docker run -d -e HUB_HOST=hub-ip selenium/node-chrome",
+          description: "Connect Chrome node to remote Hub",
+          example: "For distributed setups across multiple machines"
+        },
+        {
+          command: "docker run -d -p 4444:4444 -v /dev/shm:/dev/shm selenium/standalone-chrome",
+          description: "Run Chrome with shared memory for better performance",
+          example: "Prevents browser crashes in resource-intensive tests"
+        },
+        {
+          command: "docker run -d -p 4444:4444 -v /home/user/downloads:/home/seluser/Downloads selenium/standalone-chrome",
+          description: "Map download directory for file download tests",
+          example: "Downloaded files appear in host directory"
+        },
+        {
+          command: "docker network create selenium-grid",
+          description: "Create dedicated network for Selenium Grid",
+          example: "Isolates grid traffic from other containers"
+        },
+        {
+          command: "docker run -d --network selenium-grid --name hub selenium/hub",
+          description: "Run Hub on custom network",
+          example: "Better network isolation and management"
+        },
+        {
+          command: "docker run -d --network selenium-grid -e HUB_HOST=hub selenium/node-chrome",
+          description: "Connect Chrome node via custom network",
+          example: "Uses container name for hub discovery"
+        },
+        {
+          command: "docker run -d -e SE_OPTS='--log-level INFO' selenium/standalone-chrome",
+          description: "Set logging level for debugging",
+          example: "Available levels: SEVERE, WARNING, INFO, CONFIG, FINE"
+        },
+        {
+          command: "docker run -d -e SE_NODE_MAX_INSTANCES=3 selenium/node-chrome",
+          description: "Set maximum concurrent browser instances per node",
+          example: "Balances performance vs resource usage"
+        }
+      ]
+    }
+  ];
+
+  const volumeExamples = [
+    {
+      title: "Database Data Persistence",
+      description: "Keep MySQL data between container restarts",
+      command: "docker run -d --name mysql-db -v mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret mysql:8.0",
+      explanation: "Creates named volume 'mysql-data' to persist database files"
+    },
+    {
+      title: "Development Code Sync",
+      description: "Live reload during development",
+      command: "docker run -d -p 3000:3000 -v $(pwd):/app -v /app/node_modules node-app",
+      explanation: "Bind mounts current directory while preserving node_modules in container"
+    },
+    {
+      title: "Log File Collection",
+      description: "Centralized logging for production apps",
+      command: "docker run -d -v /var/log/myapp:/app/logs --name web-server nginx",
+      explanation: "Maps container logs to host directory for monitoring tools"
+    },
+    {
+      title: "Configuration Management",
+      description: "External config files without rebuilding images",
+      command: "docker run -d -v /host/config:/app/config:ro --name api-server my-api",
+      explanation: "Read-only mount of configuration directory"
+    },
+    {
+      title: "Backup and Restore",
+      description: "Database backup workflow",
+      command: "docker run --rm -v mysql-data:/data -v $(pwd):/backup alpine tar czf /backup/db-backup.tar.gz /data",
+      explanation: "Creates compressed backup of volume data to host directory"
+    },
+    {
+      title: "Shared Storage",
+      description: "Multiple containers sharing data",
+      command: "docker run -d -v shared-storage:/data --name app1 my-app && docker run -d -v shared-storage:/data --name app2 my-app",
+      explanation: "Both containers access same named volume for data sharing"
+    }
+  ];
+
+  const dockerComposeExample = `version: '3.8'
+services:
+  selenium-hub:
+    image: selenium/hub:latest
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    networks:
+      - selenium-grid
+
+  chrome-node-1:
+    image: selenium/node-chrome:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - selenium-grid
+    ports:
+      - "7901:7900"
+
+  chrome-node-2:
+    image: selenium/node-chrome:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - selenium-grid
+    ports:
+      - "7902:7900"
+
+  chrome-node-3:
+    image: selenium/node-chrome:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - selenium-grid
+    ports:
+      - "7903:7900"
+
+  firefox-node-1:
+    image: selenium/node-firefox:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - selenium-grid
+    ports:
+      - "7904:7900"
+
+  firefox-node-2:
+    image: selenium/node-firefox:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - selenium-grid
+    ports:
+      - "7905:7900"
+
+  edge-node:
+    image: selenium/node-edge:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - selenium-grid
+    ports:
+      - "7906:7900"
+
+networks:
+  selenium-grid:
+    driver: bridge`;
+
+  const [copiedCompose, setCopiedCompose] = useState(false);
+
+  const copyComposeToClipboard = () => {
+    navigator.clipboard.writeText(dockerComposeExample);
+    setCopiedCompose(true);
+    setTimeout(() => setCopiedCompose(false), 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-20 px-4">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.05\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        <div className="max-w-6xl mx-auto text-center relative">
+          <div className="inline-flex items-center justify-center mb-8">
+            <div className="p-4 bg-blue-500/20 rounded-full backdrop-blur-sm border border-blue-400/30">
+              <Container className="w-12 h-12 text-blue-600" />
+            </div>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Docker Mastery Guide
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            From dual-boot frustrations to seamless containerization. Master Docker with comprehensive commands, 
+            real-world examples, and professional best practices.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Terminal className="w-5 h-5" />
+              <span>Essential Commands</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <Database className="w-5 h-5" />
+              <span>Volume Management</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <TestTube className="w-5 h-5" />
+              <span>Selenium Grid</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Command Sections */}
+      <div className="max-w-7xl mx-auto px-4 pb-20">
+        {commandSections.map((section, sectionIndex) => (
+          <section key={sectionIndex} className="mb-16">
+            <div className="flex items-center gap-3 mb-8">
+              <div className={`p-3 rounded-lg bg-white shadow-md border-2 ${section.color.replace('text-', 'border-')}`}>
+                {section.icon}
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900">{section.title}</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {section.commands.map((command, index) => (
+                <CommandCard key={index} command={command} color={section.color} />
+              ))}
+            </div>
+          </section>
+        ))}
+
+        {/* Volume Examples Section */}
+        <section className="mb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-3 rounded-lg bg-white shadow-md border-2 border-green-600">
+              <HardDrive className="w-6 h-6 text-green-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900">Real-World Volume Examples</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {volumeExamples.map((example, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{example.title}</h3>
+                <p className="text-gray-600 mb-4">{example.description}</p>
+                <div className="bg-gray-50 rounded p-4 mb-3">
+                  <code className="text-sm text-gray-800 break-all">{example.command}</code>
+                </div>
+                <p className="text-sm text-gray-600 italic">{example.explanation}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Docker Compose Example */}
+        <section className="mb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-3 rounded-lg bg-white shadow-md border-2 border-orange-600">
+              <TestTube className="w-6 h-6 text-orange-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900">Complete Selenium Grid Setup</h2>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">docker-compose.yml</h3>
+              <button
+                onClick={copyComposeToClipboard}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                {copiedCompose ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copiedCompose ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+              <pre className="text-green-400 text-sm">
+                <code>{dockerComposeExample}</code>
+              </pre>
+            </div>
+            <div className="mt-4 p-4 bg-orange-50 rounded-lg">
+              <h4 className="font-semibold text-orange-800 mb-2">Quick Start:</h4>
+              <div className="space-y-2 text-sm text-orange-700">
+                <p><code className="bg-orange-100 px-2 py-1 rounded">docker-compose up -d</code> - Start the entire grid</p>
+                <p><code className="bg-orange-100 px-2 py-1 rounded">docker-compose scale chrome-node=5</code> - Scale Chrome nodes</p>
+                <p><strong>Grid Console:</strong> http://localhost:4444</p>
+                <p><strong>VNC Access:</strong> http://localhost:7901-7906 (password: secret)</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="text-center py-12 border-t border-gray-200">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Container className="w-6 h-6 text-blue-600" />
+            <span className="text-xl font-semibold text-gray-900">Docker Mastery Guide</span>
+          </div>
+          <p className="text-gray-600 mb-4">
+            From containerization basics to advanced Selenium Grid deployments
+          </p>
+          <div className="flex justify-center gap-6 text-sm text-gray-500">
+            <span>✨ Production-Ready Examples</span>
+            <span>🚀 Copy-Paste Commands</span>
+            <span>📚 Official Documentation</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+};
 
 export default App;
