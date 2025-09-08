@@ -324,6 +324,151 @@ function App() {
     }
   ];
 
+  const detailedVolumeExamples = [
+    {
+      title: 'Database Data Persistence',
+      command: 'docker run -d --name mysql-db -v mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=secret mysql:8.0',
+      description: 'Creates a named volume to persist MySQL database data across container restarts',
+      useCase: 'Essential for production databases where data must survive container updates',
+      icon: <Database className="h-5 w-5" />
+    },
+    {
+      title: 'Development Code Sync',
+      command: 'docker run -d -p 3000:3000 -v ${PWD}/src:/app/src node:18 npm run dev',
+      description: 'Bind mounts source code directory for live development with hot reload',
+      useCase: 'Development workflow where code changes reflect immediately in running container',
+      icon: <Code className="h-5 w-5" />
+    },
+    {
+      title: 'Log File Collection',
+      command: 'docker run -d --name web-server -v /host/logs:/var/log/nginx nginx:alpine',
+      description: 'Maps container logs to host directory for centralized log management',
+      useCase: 'Production monitoring and debugging by accessing logs from host system',
+      icon: <FileText className="h-5 w-5" />
+    },
+    {
+      title: 'Configuration Management',
+      command: 'docker run -d --name app -v ${PWD}/config:/app/config -v app-data:/app/data myapp:latest',
+      description: 'Combines bind mount for config files and named volume for application data',
+      useCase: 'Separate configuration management from data persistence in production apps',
+      icon: <Settings className="h-5 w-5" />
+    },
+    {
+      title: 'Backup and Restore',
+      command: 'docker run --rm -v postgres-data:/data -v ${PWD}/backup:/backup alpine tar czf /backup/db-backup.tar.gz /data',
+      description: 'Creates a backup of named volume data using a temporary container',
+      useCase: 'Regular database backups and disaster recovery procedures',
+      icon: <Download className="h-5 w-5" />
+    },
+    {
+      title: 'Shared Storage Between Containers',
+      command: 'docker run -d --name app1 -v shared-storage:/shared myapp:v1 && docker run -d --name app2 -v shared-storage:/shared myapp:v2',
+      description: 'Multiple containers sharing the same named volume for data exchange',
+      useCase: 'Microservices architecture where containers need to share files or data',
+      icon: <Server className="h-5 w-5" />
+    }
+  ];
+
+  const seleniumGridCommands = [
+    {
+      command: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-chrome:latest',
+      description: 'Run standalone Chrome browser for Selenium testing with VNC access',
+      example: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-chrome:latest',
+      useCase: 'Quick setup for single browser automated testing with visual debugging capability',
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-firefox:latest',
+      description: 'Run standalone Firefox browser for cross-browser testing',
+      example: 'docker run -d -p 4444:4444 -p 7900:7900 --shm-size=2g selenium/standalone-firefox:latest',
+      useCase: 'Firefox-specific testing scenarios and cross-browser compatibility validation',
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d -p 4444:4444 --shm-size=2g selenium/hub:latest',
+      description: 'Start Selenium Grid Hub to coordinate multiple browser nodes',
+      example: 'docker run -d -p 4444:4444 --shm-size=2g selenium/hub:latest',
+      useCase: 'Central coordination point for distributed testing across multiple browser instances',
+      icon: <Server className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d --shm-size=2g selenium/node-chrome:latest',
+      description: 'Add Chrome node to existing Selenium Grid Hub',
+      example: 'docker run -d --shm-size=2g -e HUB_HOST=hub-container selenium/node-chrome:latest',
+      useCase: 'Scale testing capacity by adding Chrome browser nodes to the grid',
+      icon: <Layers className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d --shm-size=2g selenium/node-firefox:latest',
+      description: 'Add Firefox node to existing Selenium Grid Hub',
+      example: 'docker run -d --shm-size=2g -e HUB_HOST=hub-container selenium/node-firefox:latest',
+      useCase: 'Multi-browser testing by adding Firefox nodes alongside Chrome nodes',
+      icon: <Layers className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d --shm-size=2g selenium/node-edge:latest',
+      description: 'Add Microsoft Edge node to Selenium Grid for comprehensive browser testing',
+      example: 'docker run -d --shm-size=2g -e HUB_HOST=hub-container selenium/node-edge:latest',
+      useCase: 'Complete cross-browser testing including Microsoft Edge browser',
+      icon: <Layers className="h-5 w-5" />
+    },
+    {
+      command: 'docker-compose up -d',
+      description: 'Start complete Selenium Grid with Hub and multiple browser nodes using docker-compose',
+      example: 'docker-compose -f selenium-grid-compose.yml up -d --scale chrome=3 --scale firefox=2',
+      useCase: 'Production-ready Selenium Grid setup with multiple browser instances and easy scaling',
+      icon: <Server className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d -v /dev/shm:/dev/shm selenium/standalone-chrome:latest',
+      description: 'Run Chrome with shared memory volume for better performance',
+      example: 'docker run -d -p 4444:4444 -v /dev/shm:/dev/shm selenium/standalone-chrome:latest',
+      useCase: 'Optimize browser performance by using host shared memory instead of --shm-size',
+      icon: <Zap className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d -e SE_OPTS="--log-level INFO" selenium/hub:latest',
+      description: 'Configure Selenium Hub with custom logging and options',
+      example: 'docker run -d -p 4444:4444 -e SE_OPTS="--log-level DEBUG --throw-on-capability-not-present" selenium/hub:latest',
+      useCase: 'Debug Selenium Grid issues with detailed logging and strict capability matching',
+      icon: <Settings className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d -p 5900:5900 selenium/standalone-chrome-debug:latest',
+      description: 'Run Chrome with VNC server for visual debugging of test execution',
+      example: 'docker run -d -p 4444:4444 -p 5900:5900 selenium/standalone-chrome-debug:latest',
+      useCase: 'Visual debugging of automated tests by connecting via VNC to see browser actions',
+      icon: <Monitor className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d -v ${PWD}/downloads:/home/seluser/Downloads selenium/standalone-chrome:latest',
+      description: 'Map downloads directory to access files downloaded during test execution',
+      example: 'docker run -d -p 4444:4444 -v ${PWD}/test-downloads:/home/seluser/Downloads selenium/standalone-chrome:latest',
+      useCase: 'Test file download functionality and verify downloaded files from host system',
+      icon: <Download className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d --network selenium-grid selenium/node-chrome:latest',
+      description: 'Run browser nodes on custom Docker network for better isolation',
+      example: 'docker network create selenium-grid && docker run -d --network selenium-grid --name chrome-node selenium/node-chrome:latest',
+      useCase: 'Network isolation and better container communication in complex test environments',
+      icon: <Globe className="h-5 w-5" />
+    },
+    {
+      command: 'docker run -d -e SE_NODE_MAX_INSTANCES=3 selenium/node-chrome:latest',
+      description: 'Configure maximum concurrent browser instances per node',
+      example: 'docker run -d -e SE_NODE_MAX_INSTANCES=5 -e SE_NODE_MAX_SESSIONS=5 selenium/node-chrome:latest',
+      useCase: 'Optimize resource usage by controlling concurrent test execution per container',
+      icon: <Settings className="h-5 w-5" />
+    },
+    {
+      command: 'docker run --rm -v ${PWD}/tests:/tests selenium/standalone-chrome:latest',
+      description: 'Run tests with volume mapping and auto-cleanup after execution',
+      example: 'docker run --rm -v ${PWD}/selenium-tests:/workspace -w /workspace selenium/standalone-chrome:latest python test_suite.py',
+      useCase: 'Execute test suites with automatic container cleanup and access to test files',
+      icon: <Play className="h-5 w-5" />
+    }
+  ];
   const installationSteps = {
     windows: [
       {
@@ -877,6 +1022,8 @@ function App() {
             </div>
           </div>
           
+          {/* Basic Volume Mapping Examples */}
+          <h3 className="text-3xl font-bold text-center mb-8 text-blue-300">Basic Volume Mapping Syntax</h3>
           <div className="grid md:grid-cols-3 gap-6">
             {volumeMappingExamples.map((example, index) => (
               <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 p-6 group hover:border-blue-500/50 transition-all duration-300">
@@ -912,9 +1059,254 @@ function App() {
               </div>
             ))}
           </div>
+
+          {/* Detailed Volume Examples */}
+          <div className="mt-20">
+            <h3 className="text-3xl font-bold text-center mb-8 text-blue-300">Real-World Volume Examples</h3>
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {detailedVolumeExamples.map((example, index) => (
+                <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 overflow-hidden group">
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="text-green-400 group-hover:text-green-300 transition-colors">
+                        {example.icon}
+                      </div>
+                      <h4 className="text-lg font-bold text-green-300">{example.title}</h4>
+                    </div>
+                    
+                    <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                      {example.description}
+                    </p>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Command:</p>
+                        <div className="flex items-center gap-2 bg-gray-800/80 rounded-lg p-3 group/code">
+                          <code className="text-green-400 text-xs flex-1 font-mono break-all">
+                            {example.command}
+                          </code>
+                          <button
+                            onClick={() => copyToClipboard(example.command)}
+                            className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded flex-shrink-0"
+                            title="Copy command"
+                          >
+                            {copiedCommand === example.command ? (
+                              <CheckCircle className="h-4 w-4 text-green-400" />
+                            ) : (
+                              <Copy className="h-4 w-4 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <p className="text-xs text-gray-500 mb-1">Use Case:</p>
+                        <p className="text-xs text-gray-400 leading-relaxed">
+                          {example.useCase}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* Selenium Grid Section */}
+      <section className="py-20 px-4 bg-gray-800/30">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
+            <span className="text-orange-400">Selenium Grid</span> with Docker
+          </h2>
+          <p className="text-xl text-gray-400 text-center mb-8 max-w-4xl mx-auto">
+            Run automated browser testing at scale using Selenium Grid in Docker containers
+          </p>
+          
+          {/* Selenium Grid Info */}
+          <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-2xl border border-orange-500/20 p-8 mb-12">
+            <h3 className="text-2xl font-bold mb-6 text-center text-orange-300">What is Selenium Grid?</h3>
+            <p className="text-gray-300 text-lg leading-relaxed text-center max-w-4xl mx-auto mb-6">
+              Selenium Grid allows you to run tests on different machines against different browsers in parallel. 
+              With Docker, you can easily spin up browser instances without installing browsers locally, 
+              making your testing environment consistent and scalable.
+            </p>
+            <div className="grid md:grid-cols-3 gap-6 mt-8">
+              <div className="text-center p-4 bg-orange-500/10 rounded-xl">
+                <Globe className="h-8 w-8 text-orange-400 mx-auto mb-3" />
+                <h4 className="font-bold text-orange-300 mb-2">Cross-Browser Testing</h4>
+                <p className="text-sm text-gray-400">Test on Chrome, Firefox, Edge, and Safari simultaneously</p>
+              </div>
+              <div className="text-center p-4 bg-orange-500/10 rounded-xl">
+                <Server className="h-8 w-8 text-orange-400 mx-auto mb-3" />
+                <h4 className="font-bold text-orange-300 mb-2">Parallel Execution</h4>
+                <p className="text-sm text-gray-400">Run multiple tests concurrently to reduce execution time</p>
+              </div>
+              <div className="text-center p-4 bg-orange-500/10 rounded-xl">
+                <Monitor className="h-8 w-8 text-orange-400 mx-auto mb-3" />
+                <h4 className="font-bold text-orange-300 mb-2">Visual Debugging</h4>
+                <p className="text-sm text-gray-400">VNC access to see tests running in real-time</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {seleniumGridCommands.map((cmd, index) => (
+              <div key={index} className="bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 overflow-hidden group">
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="text-orange-400 group-hover:text-orange-300 transition-colors">
+                      {cmd.icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-orange-300">{cmd.command.split(' ')[0]} {cmd.command.split(' ')[1]}</h3>
+                  </div>
+                  
+                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                    {cmd.description}
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Example:</p>
+                      <div className="flex items-center gap-2 bg-gray-800/80 rounded-lg p-3 group/code">
+                        <code className="text-green-400 text-xs flex-1 font-mono break-all">
+                          {cmd.example}
+                        </code>
+                        <button
+                          onClick={() => copyToClipboard(cmd.example)}
+                          className="opacity-0 group-hover/code:opacity-100 transition-opacity p-1 hover:bg-gray-700 rounded flex-shrink-0"
+                          title="Copy command"
+                        >
+                          {copiedCommand === cmd.example ? (
+                            <CheckCircle className="h-4 w-4 text-green-400" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Use Case:</p>
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        {cmd.useCase}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Selenium Grid Docker Compose Example */}
+          <div className="mt-12 bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-8">
+            <h3 className="text-2xl font-bold mb-6 text-center text-orange-300">Complete Selenium Grid Setup</h3>
+            <p className="text-gray-300 text-center mb-6">
+              Use this docker-compose.yml file to set up a complete Selenium Grid with Hub and multiple browser nodes:
+            </p>
+            <div className="bg-gray-800/80 rounded-lg p-6 group/code">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm text-gray-400">docker-compose.yml</span>
+                <button
+                  onClick={() => copyToClipboard(`version: '3.8'
+services:
+  selenium-hub:
+    image: selenium/hub:latest
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+      - "4442:4442"
+      - "4443:4443"
+
+  chrome:
+    image: selenium/node-chrome:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+    scale: 3
+
+  firefox:
+    image: selenium/node-firefox:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+    scale: 2
+
+  edge:
+    image: selenium/node-edge:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444`)}
+                  className="opacity-0 group-hover/code:opacity-100 transition-opacity p-2 hover:bg-gray-700 rounded"
+                  title="Copy docker-compose.yml"
+                >
+                  <Copy className="h-4 w-4 text-gray-400" />
+                </button>
+              </div>
+              <pre className="text-green-400 text-sm font-mono overflow-x-auto">
+{`version: '3.8'
+services:
+  selenium-hub:
+    image: selenium/hub:latest
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+      - "4442:4442"
+      - "4443:4443"
+
+  chrome:
+    image: selenium/node-chrome:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+    scale: 3
+
+  firefox:
+    image: selenium/node-firefox:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+    scale: 2
+
+  edge:
+    image: selenium/node-edge:latest
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444`}
+              </pre>
+            </div>
+            <div className="mt-6 grid md:grid-cols-2 gap-4">
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                <h4 className="font-bold text-blue-300 mb-2">🚀 Quick Start:</h4>
+                <code className="text-sm text-green-400">docker-compose up -d</code>
+              </div>
+              <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+                <h4 className="font-bold text-green-300 mb-2">🌐 Access Grid:</h4>
+                <code className="text-sm text-green-400">http://localhost:4444</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Getting Started Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-blue-600/10 to-purple-600/10">
         <div className="max-w-4xl mx-auto text-center">
