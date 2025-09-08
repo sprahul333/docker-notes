@@ -32,11 +32,14 @@ import {
 function App() {
   const [copiedCommand, setCopiedCommand] = useState<string>('');
 
-  const copyToClipboard = (command: string) => {
-    navigator.clipboard.writeText(command);
-    setCopiedCommand(command);
-    setTimeout(() => setCopiedCommand(''), 2000);
-  };
+ const copyToClipboard = (command: string) => {
+  navigator.clipboard.writeText(command);
+  setCopiedCommand(command);
+  const timeoutId = setTimeout(() => setCopiedCommand(''), 2000);
+  
+  // You might want to clear this timeout if component unmounts
+  return () => clearTimeout(timeoutId);
+};
 
   const dockerCommands = [
     {
