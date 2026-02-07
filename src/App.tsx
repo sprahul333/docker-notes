@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Copy, CheckCircle, Terminal, Database, Globe, Settings, Play, Pause, Trash2, Download, Search, Network, HardDrive, TestTube, BookOpen, Zap, Star, Award, Lightbulb, Code, Rocket } from 'lucide-react';
+import { Container, Copy, CheckCircle, Terminal, Database, Globe, Settings, Play, Pause, Trash2, Download, Search, Network, HardDrive, TestTube, BookOpen, Zap, Star, Award, Lightbulb, Code, Rocket, RefreshCw, Package, Info, Layers, Monitor, Activity } from 'lucide-react';
 
 interface Command {
   command: string;
@@ -36,34 +36,34 @@ const CommandCard: React.FC<{ command: Command; color: string }> = ({ command, c
   };
 
   return (
-    <div className="group bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 hover:border-blue-200">
-      <div className="flex items-start justify-between mb-4">
+    <div className="group bg-white rounded-lg shadow-md border border-gray-200 p-5 hover:shadow-xl hover:border-blue-300 transition-all duration-200">
+      <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           {command.difficulty && (
-            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium border mb-3 ${getDifficultyColor(command.difficulty)}`}>
-              {command.difficulty}
+            <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold mb-2.5 ${getDifficultyColor(command.difficulty)}`}>
+              {command.difficulty.toUpperCase()}
             </span>
           )}
-          <code className={`block text-sm font-mono ${color} bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 rounded-lg border-l-4 ${color.replace('text-', 'border-')} break-all`}>
+          <code className={`block text-sm font-mono ${color} bg-gray-50 px-3.5 py-2.5 rounded-md border border-gray-200 break-all font-medium`}>
             {command.command}
           </code>
         </div>
         <button
           onClick={() => copyToClipboard(command.command)}
-          className="ml-3 p-3 text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 rounded-lg transition-all duration-200 group-hover:scale-110"
+          className="ml-3 p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-150 border border-transparent hover:border-blue-200"
           title="Copy command"
         >
-          {copied ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+          {copied ? <CheckCircle className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
-      <p className="text-gray-700 mb-4 leading-relaxed">{command.description}</p>
+      <p className="text-gray-600 text-sm mb-3 leading-relaxed">{command.description}</p>
       {command.example && (
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 border border-indigo-100">
-          <div className="flex items-center gap-2 mb-2">
-            <Lightbulb className="w-4 h-4 text-indigo-500" />
-            <p className="text-sm font-medium text-indigo-700">Example:</p>
+        <div className="bg-blue-50 rounded-md p-3.5 border border-blue-200">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Lightbulb className="w-4 h-4 text-blue-600" />
+            <p className="text-xs font-semibold text-blue-900">EXAMPLE</p>
           </div>
-          <code className="text-sm text-gray-800 block leading-relaxed">{command.example}</code>
+          <code className="text-xs text-gray-700 block leading-relaxed font-mono">{command.example}</code>
         </div>
       )}
     </div>
@@ -150,6 +150,36 @@ const App: React.FC = () => {
           description: "Build an image from a Dockerfile in current directory",
           example: "docker build -t my-app:v1.0 .",
           difficulty: "intermediate"
+        },
+        {
+          command: "docker tag <source> <target>",
+          description: "Create a tag for an image (useful for versioning)",
+          example: "docker tag my-app:latest my-app:v1.0.0",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker push <image>",
+          description: "Upload an image to a container registry",
+          example: "docker push myuser/my-app:latest",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker login",
+          description: "Authenticate to a Docker registry",
+          example: "docker login -u myusername",
+          difficulty: "beginner"
+        },
+        {
+          command: "docker logs -f <container>",
+          description: "Follow log output in real-time",
+          example: "docker logs -f --tail 100 my-app",
+          difficulty: "beginner"
+        },
+        {
+          command: "docker kill <container>",
+          description: "Force stop a running container immediately",
+          example: "docker kill my-nginx-container",
+          difficulty: "beginner"
         }
       ]
     },
@@ -157,8 +187,8 @@ const App: React.FC = () => {
       title: "Advanced Docker Operations",
       description: "Level up your Docker skills with advanced container management techniques",
       icon: <Settings className="w-6 h-6" />,
-      color: "text-purple-600",
-      bgGradient: "from-purple-500 to-pink-500",
+      color: "text-slate-700",
+      bgGradient: "from-slate-600 to-gray-700",
       commands: [
         {
           command: "docker exec -it <container> /bin/bash",
@@ -261,6 +291,192 @@ const App: React.FC = () => {
           description: "Search for images on Docker Hub",
           example: "docker search nginx",
           difficulty: "beginner"
+        },
+        {
+          command: "docker attach <container>",
+          description: "Attach to a running container's console",
+          example: "docker attach my-app (Ctrl+P, Ctrl+Q to detach)",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker wait <container>",
+          description: "Block until container stops, then print exit code",
+          example: "docker wait my-batch-job",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker pause <container>",
+          description: "Pause all processes in a container",
+          example: "docker pause my-app",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker unpause <container>",
+          description: "Resume all processes in a paused container",
+          example: "docker unpause my-app",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker rename <old> <new>",
+          description: "Rename a container",
+          example: "docker rename old-name new-name",
+          difficulty: "beginner"
+        },
+        {
+          command: "docker update --memory 512m <container>",
+          description: "Update container resource limits",
+          example: "docker update --cpus 2 --memory 1g my-app",
+          difficulty: "advanced"
+        },
+        {
+          command: "docker events",
+          description: "Stream real-time Docker daemon events",
+          example: "docker events --filter 'type=container'",
+          difficulty: "intermediate"
+        }
+      ]
+    },
+    {
+      title: "Docker System & Cleanup",
+      description: "Manage disk space and system resources efficiently",
+      icon: <RefreshCw className="w-6 h-6" />,
+      color: "text-red-600",
+      bgGradient: "from-red-500 to-orange-500",
+      commands: [
+        {
+          command: "docker system df",
+          description: "Show Docker disk usage",
+          example: "Shows space used by images, containers, volumes, and build cache",
+          difficulty: "beginner"
+        },
+        {
+          command: "docker system prune",
+          description: "Remove all unused data (containers, networks, images)",
+          example: "docker system prune -a (includes unused images)",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker system prune -a --volumes",
+          description: "Remove all unused data including volumes",
+          example: "WARNING: This will delete all stopped containers, unused volumes, networks, and images",
+          difficulty: "advanced"
+        },
+        {
+          command: "docker system info",
+          description: "Display system-wide information",
+          example: "Shows Docker version, number of containers, images, and system configuration",
+          difficulty: "beginner"
+        },
+        {
+          command: "docker container prune",
+          description: "Remove all stopped containers",
+          example: "docker container prune -f (skip confirmation)",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker image prune",
+          description: "Remove unused images",
+          example: "docker image prune -a (remove all unused images)",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker network prune",
+          description: "Remove all unused networks",
+          example: "docker network prune -f",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker volume prune",
+          description: "Remove all unused local volumes",
+          example: "WARNING: This permanently deletes volume data",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker rm $(docker ps -aq)",
+          description: "Remove all containers (stopped and running)",
+          example: "docker stop $(docker ps -q) && docker rm $(docker ps -aq)",
+          difficulty: "advanced"
+        },
+        {
+          command: "docker rmi $(docker images -q)",
+          description: "Remove all images from your system",
+          example: "Use with caution - removes ALL images",
+          difficulty: "advanced"
+        },
+        {
+          command: "docker builder prune",
+          description: "Remove build cache",
+          example: "docker builder prune -a (remove all build cache)",
+          difficulty: "intermediate"
+        }
+      ]
+    },
+    {
+      title: "Docker Networking",
+      description: "Configure and manage container networking for complex applications",
+      icon: <Network className="w-6 h-6" />,
+      color: "text-cyan-600",
+      bgGradient: "from-cyan-500 to-blue-500",
+      commands: [
+        {
+          command: "docker network create <name>",
+          description: "Create a user-defined bridge network",
+          example: "docker network create --driver bridge my-network",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker network ls",
+          description: "List all networks",
+          example: "Shows bridge, host, none, and custom networks",
+          difficulty: "beginner"
+        },
+        {
+          command: "docker network inspect <network>",
+          description: "View detailed network configuration",
+          example: "docker network inspect bridge",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker network connect <network> <container>",
+          description: "Connect container to a network",
+          example: "docker network connect my-network my-app",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker network disconnect <network> <container>",
+          description: "Disconnect container from a network",
+          example: "docker network disconnect my-network my-app",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker network rm <network>",
+          description: "Remove a network",
+          example: "docker network rm my-network",
+          difficulty: "beginner"
+        },
+        {
+          command: "docker run --network <network> <image>",
+          description: "Start container on specific network",
+          example: "docker run --network my-network --name web nginx",
+          difficulty: "intermediate"
+        },
+        {
+          command: "docker run --network host <image>",
+          description: "Use host network stack (no isolation)",
+          example: "docker run --network host nginx",
+          difficulty: "advanced"
+        },
+        {
+          command: "docker network create --subnet 172.20.0.0/16 <name>",
+          description: "Create network with custom subnet",
+          example: "docker network create --subnet 10.0.0.0/24 --gateway 10.0.0.1 custom-net",
+          difficulty: "advanced"
+        },
+        {
+          command: "docker run --link <container>:<alias> <image>",
+          description: "Link containers (legacy, use networks instead)",
+          example: "docker run --link database:db web-app",
+          difficulty: "intermediate"
         }
       ]
     },
@@ -492,6 +708,46 @@ const App: React.FC = () => {
       explanation: "Combines data persistence with initialization script mounting",
       icon: <Database className="w-6 h-6 text-blue-600" />,
       difficulty: "intermediate"
+    },
+    {
+      title: "Redis Cache with Persistence",
+      description: "Redis with data persistence for session storage",
+      command: "docker run -d -p 6379:6379 -v redis-data:/data --name redis redis redis-server --appendonly yes",
+      explanation: "Enables Redis append-only file (AOF) persistence to prevent data loss",
+      icon: <Activity className="w-6 h-6 text-red-500" />,
+      difficulty: "intermediate"
+    },
+    {
+      title: "Jenkins CI/CD Server",
+      description: "Jenkins with persistent jobs and configurations",
+      command: "docker run -d -p 8080:8080 -v jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock jenkins/jenkins:lts",
+      explanation: "Persists Jenkins data and allows Docker commands inside Jenkins",
+      icon: <Rocket className="w-6 h-6 text-blue-500" />,
+      difficulty: "advanced"
+    },
+    {
+      title: "SSL Certificate Storage",
+      description: "Nginx with SSL certificates from host",
+      command: "docker run -d -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt:ro -v ./nginx.conf:/etc/nginx/nginx.conf:ro nginx",
+      explanation: "Read-only mount of SSL certificates for secure HTTPS serving",
+      icon: <Globe className="w-6 h-6 text-green-500" />,
+      difficulty: "advanced"
+    },
+    {
+      title: "MongoDB with Backup",
+      description: "MongoDB with automated backup capability",
+      command: "docker run -d -p 27017:27017 -v mongo-data:/data/db -v ./backup:/backup --name mongodb mongo",
+      explanation: "Separate volumes for data and backups enable easy data management",
+      icon: <Database className="w-6 h-6 text-green-600" />,
+      difficulty: "intermediate"
+    },
+    {
+      title: "Development with Hot Reload",
+      description: "React app with live code synchronization",
+      command: "docker run -d -p 3000:3000 -v $(pwd)/src:/app/src -v /app/node_modules -e CHOKIDAR_USEPOLLING=true react-app",
+      explanation: "Enables hot module replacement while preserving node_modules in container",
+      icon: <Code className="w-6 h-6 text-cyan-500" />,
+      difficulty: "intermediate"
     }
   ];
 
@@ -635,108 +891,98 @@ networks:
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* Animated Background Pattern */}
-      <div className="fixed inset-0 opacity-5">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent opacity-20"></div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-24 px-4">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10"></div>
-        
+      <section className="relative overflow-hidden py-20 px-4 bg-gradient-to-r from-blue-600 to-cyan-600">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-20"></div>
+
         <div className="max-w-6xl mx-auto text-center relative">
-          <div className="inline-flex items-center justify-center mb-8">
+          <div className="inline-flex items-center justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
-              <div className="relative p-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
-                <Container className="w-12 h-12 text-white" />
+              <div className="absolute inset-0 bg-white/30 rounded-2xl blur-xl"></div>
+              <div className="relative p-5 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
+                <Container className="w-14 h-14 text-white" />
               </div>
-            </div>
-          </div>
-          
-          <div className="mb-6">
-            <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4 leading-tight">
-              Docker Mastery
-            </h1>
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <Star className="w-6 h-6 text-yellow-500 fill-current" />
-              <span className="text-2xl font-semibold text-gray-700">Learn • Practice • Master</span>
-              <Star className="w-6 h-6 text-yellow-500 fill-current" />
-            </div>
-          </div>
-          
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
-            Transform from containerization beginner to Docker expert with our comprehensive, 
-            hands-on learning guide featuring real-world examples and best practices.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-3 bg-gradient-to-r from-green-400 to-blue-500 rounded-full">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Learn Fundamentals</h3>
-              <p className="text-gray-600 text-sm">Master essential Docker commands with clear explanations</p>
-            </div>
-            
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-3 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full">
-                  <Zap className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Practice Examples</h3>
-              <p className="text-gray-600 text-sm">Real-world scenarios with copy-paste commands</p>
-            </div>
-            
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-3 bg-gradient-to-r from-orange-400 to-red-500 rounded-full">
-                  <Award className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Achieve Mastery</h3>
-              <p className="text-gray-600 text-sm">Advanced techniques for production environments</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <div className="flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full border border-green-200">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="font-medium">Beginner Friendly</span>
+          <div className="mb-6">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-3 leading-tight tracking-tight">
+              Testing Professor
+            </h1>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="h-px w-12 bg-white/40"></div>
+              <span className="text-xl font-medium text-white/90">Docker Command Reference</span>
+              <div className="h-px w-12 bg-white/40"></div>
             </div>
-            <div className="flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full border border-yellow-200">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-              <span className="font-medium">Intermediate Concepts</span>
+          </div>
+
+          <p className="text-lg md:text-xl text-white/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+            Complete guide to Docker commands with practical examples for containerization,
+            testing infrastructure, and production deployments.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-200">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-2.5 bg-green-500 rounded-lg">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+              </div>
+              <h3 className="text-base font-bold text-gray-800 mb-1.5">Fundamentals</h3>
+              <p className="text-gray-600 text-xs leading-relaxed">Essential commands</p>
             </div>
-            <div className="flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-full border border-red-200">
-              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <span className="font-medium">Advanced Techniques</span>
+
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-200">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-2.5 bg-blue-500 rounded-lg">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+              </div>
+              <h3 className="text-base font-bold text-gray-800 mb-1.5">Examples</h3>
+              <p className="text-gray-600 text-xs leading-relaxed">Real-world scenarios</p>
+            </div>
+
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-200">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-2.5 bg-orange-500 rounded-lg">
+                  <TestTube className="w-5 h-5 text-white" />
+                </div>
+              </div>
+              <h3 className="text-base font-bold text-gray-800 mb-1.5">Testing</h3>
+              <p className="text-gray-600 text-xs leading-relaxed">Selenium Grid setup</p>
+            </div>
+
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-200">
+              <div className="flex items-center justify-center mb-3">
+                <div className="p-2.5 bg-cyan-500 rounded-lg">
+                  <Award className="w-5 h-5 text-white" />
+                </div>
+              </div>
+              <h3 className="text-base font-bold text-gray-800 mb-1.5">Production</h3>
+              <p className="text-gray-600 text-xs leading-relaxed">Advanced techniques</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Command Sections */}
-      <div className="max-w-7xl mx-auto px-4 pb-20">
+      <div className="max-w-7xl mx-auto px-4 pb-16 pt-12">
         {commandSections.map((section, sectionIndex) => (
-          <section key={sectionIndex} className="mb-20">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center mb-6">
-                <div className={`p-4 bg-gradient-to-r ${section.bgGradient} rounded-2xl shadow-lg`}>
+          <section key={sectionIndex} className="mb-16">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center justify-center mb-5">
+                <div className={`p-3.5 bg-gradient-to-r ${section.bgGradient} rounded-xl shadow-md`}>
                   <div className="text-white">
                     {section.icon}
                   </div>
                 </div>
               </div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">{section.title}</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">{section.description}</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">{section.title}</h2>
+              <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">{section.description}</p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {section.commands.map((command, index) => (
                 <CommandCard key={index} command={command} color={section.color} />
               ))}
@@ -745,46 +991,46 @@ networks:
         ))}
 
         {/* Volume Examples Section */}
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center mb-6">
-              <div className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl shadow-lg">
+        <section className="mb-16">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center mb-5">
+              <div className="p-3.5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl shadow-md">
                 <HardDrive className="w-6 h-6 text-white" />
               </div>
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Real-World Volume Examples</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Practical scenarios showing how to use Docker volumes for data persistence, development workflows, and production deployments
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Real-World Volume Examples</h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Practical scenarios for data persistence, development workflows, and production deployments
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {volumeExamples.map((example, index) => (
-              <div key={index} className="group bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="flex-shrink-0">
+              <div key={index} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-xl hover:border-green-300 transition-all duration-200">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="flex-shrink-0 mt-1">
                     {example.icon}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900">{example.title}</h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-lg font-bold text-gray-900">{example.title}</h3>
+                      <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
                         example.difficulty === 'beginner' ? 'bg-green-100 text-green-800 border border-green-200' :
                         example.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
                         'bg-red-100 text-red-800 border border-red-200'
                       }`}>
-                        {example.difficulty}
+                        {example.difficulty?.toUpperCase()}
                       </span>
                     </div>
-                    <p className="text-gray-600 mb-4">{example.description}</p>
+                    <p className="text-gray-600 text-sm mb-3">{example.description}</p>
                   </div>
                 </div>
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 mb-4 border-l-4 border-green-500">
-                  <code className="text-sm text-gray-800 break-all leading-relaxed">{example.command}</code>
+                <div className="bg-gray-50 rounded-md p-3.5 mb-3 border border-gray-200">
+                  <code className="text-xs text-gray-800 break-all leading-relaxed font-mono">{example.command}</code>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Lightbulb className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-gray-600 italic leading-relaxed">{example.explanation}</p>
+                  <Lightbulb className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-gray-600 leading-relaxed">{example.explanation}</p>
                 </div>
               </div>
             ))}
@@ -792,70 +1038,68 @@ networks:
         </section>
 
         {/* Docker Compose Example */}
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center mb-6">
-              <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg">
+        <section className="mb-16">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center mb-5">
+              <div className="p-3.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-md">
                 <TestTube className="w-6 h-6 text-white" />
               </div>
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Production Selenium Grid Setup</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Production Selenium Grid Setup</h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Complete Docker Compose configuration for scalable browser testing infrastructure
             </p>
           </div>
-          
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white/20 rounded-lg">
-                    <Code className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white">docker-compose.yml</h3>
+
+          <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 px-5 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-white/20 rounded-md">
+                  <Code className="w-4 h-4 text-white" />
                 </div>
-                <button
-                  onClick={copyComposeToClipboard}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/20"
-                >
-                  {copiedCompose ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {copiedCompose ? 'Copied!' : 'Copy'}
-                </button>
+                <h3 className="text-base font-bold text-white">docker-compose.yml</h3>
               </div>
+              <button
+                onClick={copyComposeToClipboard}
+                className="flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-md transition-all duration-150 text-sm font-medium border border-white/30"
+              >
+                {copiedCompose ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copiedCompose ? 'Copied' : 'Copy'}
+              </button>
             </div>
-            
-            <div className="bg-gray-900 p-6 overflow-x-auto">
-              <pre className="text-green-400 text-sm leading-relaxed">
+
+            <div className="bg-gray-900 p-5 overflow-x-auto">
+              <pre className="text-green-400 text-xs leading-relaxed font-mono">
                 <code>{dockerComposeExample}</code>
               </pre>
             </div>
-            
-            <div className="p-6 bg-gradient-to-r from-orange-50 to-red-50 border-t border-orange-100">
-              <h4 className="font-semibold text-orange-800 mb-4 flex items-center gap-2">
-                <Rocket className="w-5 h-5" />
-                Quick Start Commands:
+
+            <div className="px-5 py-4 bg-orange-50 border-t border-orange-200">
+              <h4 className="font-bold text-orange-900 mb-3 flex items-center gap-2 text-sm">
+                <Rocket className="w-4 h-4" />
+                Quick Start Commands
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="space-y-2">
                   <p className="flex items-center gap-2">
-                    <code className="bg-orange-100 text-orange-800 px-3 py-1 rounded-lg font-mono">docker-compose up -d</code>
+                    <code className="bg-orange-100 text-orange-800 px-2.5 py-1 rounded-md font-mono font-medium">docker-compose up -d</code>
                     <span className="text-orange-700">Start the grid</span>
                   </p>
                   <p className="flex items-center gap-2">
-                    <code className="bg-orange-100 text-orange-800 px-3 py-1 rounded-lg font-mono">docker-compose scale chrome-node-1=3</code>
+                    <code className="bg-orange-100 text-orange-800 px-2.5 py-1 rounded-md font-mono font-medium text-xs">docker-compose scale chrome-node-1=3</code>
                     <span className="text-orange-700">Scale nodes</span>
                   </p>
                 </div>
                 <div className="space-y-2">
                   <p className="flex items-center gap-2">
                     <Globe className="w-4 h-4 text-orange-600" />
-                    <strong className="text-orange-800">Grid Console:</strong>
-                    <span className="text-orange-700">http://localhost:4444</span>
+                    <strong className="text-orange-900">Grid Console:</strong>
+                    <span className="text-orange-700 font-mono">localhost:4444</span>
                   </p>
                   <p className="flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-orange-600" />
-                    <strong className="text-orange-800">VNC Access:</strong>
-                    <span className="text-orange-700">localhost:7901-7906 (password: secret)</span>
+                    <strong className="text-orange-900">VNC Access:</strong>
+                    <span className="text-orange-700 font-mono">localhost:7901-7906</span>
                   </p>
                 </div>
               </div>
@@ -864,34 +1108,34 @@ networks:
         </section>
 
         {/* Footer */}
-        <footer className="text-center py-16 border-t border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
-              <Container className="w-6 h-6 text-white" />
+        <footer className="text-center py-12 mt-8 border-t border-gray-200 bg-slate-50 rounded-lg">
+          <div className="flex items-center justify-center gap-2.5 mb-4">
+            <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
+              <Container className="w-5 h-5 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Docker Mastery Guide
+            <span className="text-xl font-bold text-gray-900">
+              Testing Professor
             </span>
           </div>
-          <p className="text-gray-600 mb-6 text-lg">
-            From containerization basics to advanced production deployments
+          <p className="text-gray-600 mb-5 text-sm">
+            Complete Docker command reference for testing and production
           </p>
-          <div className="flex flex-wrap justify-center gap-6 text-sm">
-            <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex flex-wrap justify-center gap-5 text-xs">
+            <div className="flex items-center gap-1.5 text-gray-600">
               <Star className="w-4 h-4 text-yellow-500 fill-current" />
-              <span>Production-Ready Examples</span>
+              <span>Production-Ready</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-1.5 text-gray-600">
               <Zap className="w-4 h-4 text-blue-500" />
               <span>Copy-Paste Commands</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-1.5 text-gray-600">
               <BookOpen className="w-4 h-4 text-green-500" />
-              <span>Official Documentation</span>
+              <span>Real-World Examples</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Award className="w-4 h-4 text-purple-500" />
-              <span>Expert-Level Content</span>
+            <div className="flex items-center gap-1.5 text-gray-600">
+              <Award className="w-4 h-4 text-cyan-500" />
+              <span>Expert-Level</span>
             </div>
           </div>
         </footer>
