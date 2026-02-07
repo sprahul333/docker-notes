@@ -899,9 +899,13 @@ networks:
         <div className="max-w-6xl mx-auto text-center relative">
           <div className="inline-flex items-center justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-white/30 rounded-2xl blur-xl"></div>
-              <div className="relative p-5 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30">
-                <Container className="w-14 h-14 text-white" />
+              <div className="absolute inset-0 bg-yellow-400/40 rounded-full blur-2xl"></div>
+              <div className="relative">
+                <img
+                  src="/testing_professor.png"
+                  alt="Testing Professor Logo"
+                  className="w-32 h-32 rounded-full border-4 border-white/40 shadow-2xl"
+                />
               </div>
             </div>
           </div>
@@ -1109,10 +1113,12 @@ networks:
 
         {/* Footer */}
         <footer className="text-center py-12 mt-8 border-t border-gray-200 bg-slate-50 rounded-lg">
-          <div className="flex items-center justify-center gap-2.5 mb-4">
-            <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
-              <Container className="w-5 h-5 text-white" />
-            </div>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <img
+              src="/testing_professor.png"
+              alt="Testing Professor Logo"
+              className="w-12 h-12 rounded-full border-2 border-blue-200 shadow-md"
+            />
             <span className="text-xl font-bold text-gray-900">
               Testing Professor
             </span>
